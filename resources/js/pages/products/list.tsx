@@ -1,12 +1,25 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { useEffect } from 'react';
-import { Pagination } from '../../components/ui/pagination';
+import { useState } from 'react';
+import { Table, Input as AntInput, Button as AntButton, Tag, Space, Tooltip, Pagination } from 'antd';
+import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { Product } from '@/types/product';
+import { router } from '@inertiajs/react';
+
+interface FilterState {
+    search: string;
+    category: string;
+    min_price: string | number;
+    max_price: string | number;
+    sort_field: string;
+    sort_direction: 'asc' | 'desc';
+    page: number;
+    per_page: number;
+}
 
 interface Props {
     products: {
@@ -39,80 +52,238 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Productos', href: '/products' },
 ];
 
-export default function ProductList({ products, filters }: Props) {
-    const { data, setData, get, processing } = useForm({
-        search: filters.search ?? '',
-        category: filters.category ?? '',
-        min_price: filters.min_price ?? '',
-        max_price: filters.max_price ?? '',
-        sort_field: filters.sort_field ?? 'created_at',
-        sort_direction: filters.sort_direction ?? 'desc',
-        page: filters.page ?? 1,
-        per_page: filters.per_page ?? 10
-    });
+// Valores por defecto para los filtros
+const defaultFilters: FilterState = {
+    search: '',
+    category: '',
+    min_price: '',
+    max_price: '',
+    sort_field: 'created_at',
+    sort_direction: 'desc',
+    page: 1,
+    per_page: 10
+};
 
-    useEffect(() => {
-        if (data.page !== filters.page) {
-            setData('page', filters.page ?? 1);
-        }
-    }, [filters.page]);
+export default function ProductList({ products, filters }: Props) {
+    // Estado único para todos los filtros
+    const [filterState, setFilterState] = useState<FilterState>({
+        search: filters.search || '',
+        category: filters.category || '',
+        min_price: filters.min_price || '',
+        max_price: filters.max_price || '',
+        sort_field: filters.sort_field || 'created_at',
+        sort_direction: filters.sort_direction || 'desc',
+        page: filters.page || 1,
+        per_page: filters.per_page || 10
+    });
+    const [loading, setLoading] = useState(false);
+
+    // Función para actualizar un campo específico del estado
+    const updateFilter = (field: keyof FilterState, value: string | number) => {
+        setFilterState(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    // Función para aplicar los filtros
+    const applyFilters = (newFilters: Partial<FilterState> = {}) => {
+        setLoading(true);
+
+        // Combinar el estado actual con los nuevos filtros
+        const updatedFilters = {
+            ...filterState,
+            ...newFilters
+        };
+
+        // Actualizar el estado con los nuevos valores
+        setFilterState(updatedFilters);
+
+        // Filtramos los parámetros vacíos para no enviarlos
+        const filteredParams = Object.fromEntries(
+            Object.entries(updatedFilters).filter(([, value]) =>
+                value !== undefined && value !== null && value !== ''
+            )
+        );
+
+        // Usamos router.get de Inertia para navegar a la URL con los filtros
+        router.get(route('products.index'), filteredParams as Record<string, string>, {
+            preserveState: true,
+            replace: true,
+            onSuccess: () => setLoading(false),
+            onError: () => setLoading(false)
+        });
+    };
 
     function handleSearch(e: React.FormEvent) {
         e.preventDefault();
-        setData('page', 1);
-        get(route('products.index'), {
-            preserveState: true,
-        });
+        applyFilters({ page: 1 });
     }
 
-    function handlePerPageChange(perPage: number) {
-        setData('per_page', perPage);
-        setData('page', 1);
-        get(route('products.index'), {
-            preserveState: true,
-        });
+    function handlePerPageChange(newPerPage: number) {
+        applyFilters({ per_page: newPerPage, page: 1 });
     }
 
-    function handlePageChange(page: number) {
-        setData('page', page);
-        get(route('products.index'), {
-            preserveState: true,
-        });
+    function handlePageChange(newPage: number) {
+        applyFilters({ page: newPage });
     }
 
     function clearFilters() {
-        setData({
-            search: '',
-            category: '',
-            min_price: '',
-            max_price: '',
-            sort_field: 'created_at',
-            sort_direction: 'desc',
-            page: 1,
-            per_page: 10,
-        });
-        get(route('products.index'), {
-            preserveState: true,
+        // Resetear todos los filtros a los valores por defecto
+        setFilterState(defaultFilters);
+
+        // Limpiar todos los filtros en la URL
+        router.get(route('products.index'), {}, {
+            preserveState: false,
+            replace: true
         });
     }
 
-    function handleSort(field: string) {
-        const direction = data.sort_field === field && data.sort_direction === 'asc' ? 'desc' : 'asc';
-        setData({
-            ...data,
-            sort_field: field,
-            sort_direction: direction,
-        });
-        get(route('products.index'), {
-            preserveState: true,
+    function handleSort(sorter: SorterResult<Product> | SorterResult<Product>[]) {
+        const { field, order } = Array.isArray(sorter) ? sorter[0] : sorter;
+
+        if (!field) return;
+
+        let newSortField: string;
+        let newSortDirection: 'asc' | 'desc';
+
+        // Si order es undefined (tercer click), volvemos al orden predeterminado
+        if (order === undefined) {
+            newSortField = 'created_at';
+            newSortDirection = 'desc';
+        } else {
+            // Normal: ascendente o descendente
+            newSortField = field as string;
+            newSortDirection = order === 'ascend' ? 'asc' : 'desc';
+        }
+
+        applyFilters({
+            sort_field: newSortField,
+            sort_direction: newSortDirection
         });
     }
 
-    // Función para mostrar el indicador de dirección de ordenamiento
-    function getSortIndicator(field: string) {
-        if (data.sort_field !== field) return null;
-        return data.sort_direction === 'asc' ? '↑' : '↓';
-    }
+    // Configuración de las columnas para la tabla de Ant Design
+    const columns: ColumnsType<Product> = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            sorter: true,
+            sortOrder: filterState.sort_field === 'id'
+                ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+                : null,
+            width: 80,
+        },
+        {
+            title: 'Nombre',
+            dataIndex: 'name',
+            key: 'name',
+            sorter: true,
+            sortOrder: filterState.sort_field === 'name'
+                ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+                : null,
+            render: (text) => <Tooltip title={text}><span className="cursor-pointer">{text}</span></Tooltip>,
+        },
+        {
+            title: 'Precio',
+            dataIndex: 'price',
+            key: 'price',
+            sorter: true,
+            sortOrder: filterState.sort_field === 'price'
+                ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+                : null,
+            render: (price) => <span className="font-medium">${price}</span>,
+        },
+        {
+            title: 'Stock',
+            dataIndex: 'stock',
+            key: 'stock',
+            sorter: true,
+            sortOrder: filterState.sort_field === 'stock'
+                ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+                : null,
+            render: (stock) => {
+                let color = 'green';
+                if (stock < 10) color = 'red';
+                else if (stock < 20) color = 'orange';
+
+                return <Tag color={color}>{stock}</Tag>;
+            },
+        },
+        {
+            title: 'Creado',
+            dataIndex: 'created_at',
+            key: 'created_at',
+            sorter: true,
+            sortOrder: filterState.sort_field === 'created_at'
+                ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+                : null,
+            render: (date) => new Date(date).toLocaleDateString(),
+        },
+        {
+            title: 'Acciones',
+            key: 'actions',
+            width: 120,
+            render: (_, record) => (
+                <Space size="small">
+                    <Link href={route('products.show', record.id)}>
+                        <AntButton
+                            type="text"
+                            icon={<EyeOutlined />}
+                            title="Ver"
+                        />
+                    </Link>
+                    <Link href={route('products.edit', record.id)}>
+                        <AntButton
+                            type="text"
+                            icon={<EditOutlined />}
+                            title="Editar"
+                        />
+                    </Link>
+                </Space>
+            ),
+        },
+    ];
+
+    // Manejador para cambios en la tabla (ordenamiento y paginación)
+    const handleTableChange = (
+        pagination: TablePaginationConfig,
+        _: Record<string, FilterValue | null>,
+        sorter: SorterResult<Product> | SorterResult<Product>[]
+    ) => {
+        // Manejar cambios de página
+        if (pagination.current) {
+            handlePageChange(pagination.current);
+        }
+
+        // Manejar cambios de elementos por página
+        if (pagination.pageSize && pagination.pageSize !== filterState.per_page) {
+            handlePerPageChange(pagination.pageSize);
+        }
+
+        // Manejar cambios de ordenamiento
+        if (sorter) {
+            // Extraer la información de orden (puede ser un array o un objeto único)
+            const sorterObj = Array.isArray(sorter) ? sorter[0] : sorter;
+
+            // Pasar al manejador de ordenamiento siempre, incluso si no hay orden (para resetear)
+            handleSort(sorterObj);
+        }
+    };
+
+    // Verificar si hay filtros activos
+    const hasActiveFilters = () => {
+        return !!(
+            filterState.search ||
+            filterState.category ||
+            filterState.min_price ||
+            filterState.max_price ||
+            filterState.sort_field !== 'created_at' ||
+            filterState.sort_direction !== 'desc' ||
+            filterState.per_page !== 10
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -124,146 +295,66 @@ export default function ProductList({ products, filters }: Props) {
                             <CardTitle>Lista de Productos</CardTitle>
                             <div className="flex space-x-2">
                                 <form onSubmit={handleSearch} className="flex space-x-2">
-                                    <Input
+                                    <AntInput
                                         placeholder="Buscar productos..."
-                                        value={data.search}
-                                        onChange={e => setData('search', e.target.value)}
-                                        className="w-64"
+                                        value={filterState.search}
+                                        onChange={e => updateFilter('search', e.target.value)}
+                                        style={{ width: 200 }}
+                                        prefix={<SearchOutlined />}
+                                        allowClear
                                     />
-                                    <Button type="submit" disabled={processing}>
-                                        Buscar
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={clearFilters}
-                                        disabled={processing}
+                                    <AntButton
+                                        type="primary"
+                                        htmlType="submit"
+                                        loading={loading}
                                     >
-                                        Limpiar Filtros
-                                    </Button>
+                                        Buscar
+                                    </AntButton>
+                                    <AntButton
+                                        onClick={clearFilters}
+                                        disabled={loading}
+                                        danger={hasActiveFilters()}
+                                        icon={<ClearOutlined />}
+                                    >
+                                        Limpiar
+                                    </AntButton>
                                 </form>
-                                <Button asChild>
-                                    <Link href={route('products.create')}>
+                                <Link href={route('products.create')}>
+                                    <AntButton type="primary" icon={<PlusOutlined />}>
                                         Crear Producto
-                                    </Link>
-                                </Button>
+                                    </AntButton>
+                                </Link>
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="overflow-x-auto">
-                                <table className="w-full border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100 dark:bg-gray-800">
-                                            <th className="px-4 py-2 text-left">
-                                                <button
-                                                    onClick={() => handleSort('id')}
-                                                    className="font-semibold text-sm uppercase flex items-center"
-                                                >
-                                                    ID {getSortIndicator('id')}
-                                                </button>
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                <button
-                                                    onClick={() => handleSort('name')}
-                                                    className="font-semibold text-sm uppercase flex items-center"
-                                                >
-                                                    Nombre {getSortIndicator('name')}
-                                                </button>
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                <button
-                                                    onClick={() => handleSort('price')}
-                                                    className="font-semibold text-sm uppercase flex items-center"
-                                                >
-                                                    Precio {getSortIndicator('price')}
-                                                </button>
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                <button
-                                                    onClick={() => handleSort('stock')}
-                                                    className="font-semibold text-sm uppercase flex items-center"
-                                                >
-                                                    Stock {getSortIndicator('stock')}
-                                                </button>
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                <button
-                                                    onClick={() => handleSort('created_at')}
-                                                    className="font-semibold text-sm uppercase flex items-center"
-                                                >
-                                                    Creado {getSortIndicator('created_at')}
-                                                </button>
-                                            </th>
-                                            <th className="px-4 py-2 text-right">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {products.data.map((product) => (
-                                            <tr key={product.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900">
-                                                <td className="px-4 py-3">{product.id}</td>
-                                                <td className="px-4 py-3">{product.name}</td>
-                                                <td className="px-4 py-3 font-medium">${product.price}</td>
-                                                <td className="px-4 py-3">{product.stock}</td>
-                                                <td className="px-4 py-3 text-sm">
-                                                    {new Date(product.created_at).toLocaleDateString()}
-                                                </td>
-                                                <td className="px-4 py-3 text-right space-x-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        asChild
-                                                    >
-                                                        <Link href={route('products.show', product.id)}>
-                                                            Ver
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        asChild
-                                                    >
-                                                        <Link href={route('products.edit', product.id)}>
-                                                            Editar
-                                                        </Link>
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {products.data.length === 0 && (
-                                <div className="text-center py-8">
-                                    <p className="text-gray-500 dark:text-gray-400">
-                                        No se encontraron productos
-                                    </p>
-                                </div>
-                            )}
+                            <Table
+                                columns={columns}
+                                dataSource={products.data}
+                                rowKey="id"
+                                pagination={false}
+                                onChange={handleTableChange}
+                                loading={loading}
+                                size="middle"
+                                bordered
+                                sortDirections={['ascend', 'descend', 'ascend']}
+                                locale={{ emptyText: 'No se encontraron productos' }}
+                            />
 
                             {products.last_page > 1 && (
-                                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between">
+                                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between">
                                     <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-0">
                                         Mostrando {products.from} a {products.to} de {products.total} resultados
                                     </div>
                                     <Pagination
-                                        currentPage={products.current_page}
-                                        totalPages={products.last_page}
-                                        onPageChange={handlePageChange}
+                                        current={products.current_page}
+                                        total={products.total}
+                                        pageSize={products.per_page}
+                                        onChange={handlePageChange}
+                                        showSizeChanger
+                                        onShowSizeChange={(_, size) => handlePerPageChange(size)}
+                                        pageSizeOptions={['10', '25', '50', '100']}
+                                        showTotal={(total, range) => `${range[0]}-${range[1]} de ${total} registros`}
                                     />
-                                    <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                                        <span className="text-sm text-gray-500 dark:text-gray-400">Mostrar:</span>
-                                        <select
-                                            value={data.per_page}
-                                            onChange={(e) => handlePerPageChange(Number(e.target.value))}
-                                            className="border rounded p-1 text-sm"
-                                        >
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
-                                    </div>
                                 </div>
                             )}
                         </CardContent>

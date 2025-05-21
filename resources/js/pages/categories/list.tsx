@@ -1,17 +1,27 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { useEffect } from 'react';
-import { Pagination } from '../../components/ui/pagination';
+import { useState } from 'react';
+import { Table, Input as AntInput, Button as AntButton, Space, Tooltip, Pagination } from 'antd';
+import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import type { FilterValue, SorterResult } from 'antd/es/table/interface';
+import { router } from '@inertiajs/react';
 
 interface Category {
     id: number;
     name: string;
     created_at: string;
     updated_at: string;
+}
+
+interface FilterState {
+    search: string;
+    sort_field: string;
+    sort_direction: 'asc' | 'desc';
+    page: number;
+    per_page: number;
 }
 
 interface Props {
@@ -42,74 +52,203 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Categorías', href: '/categories' },
 ];
 
-export default function CategoryList({ categories, filters }: Props) {
-    const { data, setData, get, processing } = useForm({
-        search: filters.search ?? '',
-        sort_field: filters.sort_field ?? 'created_at',
-        sort_direction: filters.sort_direction ?? 'desc',
-        page: filters.page ?? 1,
-        per_page: filters.per_page ?? 10,
-    });
+// Valores por defecto para los filtros
+const defaultFilters: FilterState = {
+    search: '',
+    sort_field: 'created_at',
+    sort_direction: 'desc',
+    page: 1,
+    per_page: 10
+};
 
-    useEffect(() => {
-        if (data.page !== filters.page) {
-            setData('page', filters.page ?? 1);
-        }
-    }, [filters.page]);
+export default function CategoryList({ categories, filters }: Props) {
+    // Estado único para todos los filtros
+    const [filterState, setFilterState] = useState<FilterState>({
+        search: filters.search || '',
+        sort_field: filters.sort_field || 'created_at',
+        sort_direction: filters.sort_direction || 'desc',
+        page: filters.page || 1,
+        per_page: filters.per_page || 10
+    });
+    const [loading, setLoading] = useState(false);
+
+    // Función para actualizar un campo específico del estado
+    const updateFilter = (field: keyof FilterState, value: string | number) => {
+        setFilterState(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    // Función para aplicar los filtros
+    const applyFilters = (newFilters: Partial<FilterState> = {}) => {
+        setLoading(true);
+
+        // Combinar el estado actual con los nuevos filtros
+        const updatedFilters = {
+            ...filterState,
+            ...newFilters
+        };
+
+        // Actualizar el estado con los nuevos valores
+        setFilterState(updatedFilters);
+
+        // Filtramos los parámetros vacíos para no enviarlos
+        const filteredParams = Object.fromEntries(
+            Object.entries(updatedFilters).filter(([, value]) =>
+                value !== undefined && value !== null && value !== ''
+            )
+        );
+
+        // Usamos router.get de Inertia para navegar a la URL con los filtros
+        router.get(route('categories.index'), filteredParams as Record<string, string>, {
+            preserveState: true,
+            replace: true,
+            onSuccess: () => setLoading(false),
+            onError: () => setLoading(false)
+        });
+    };
 
     function handleSearch(e: React.FormEvent) {
         e.preventDefault();
-        setData('page', 1);
-        get(route('categories.index'), {
-            preserveState: true,
-        });
+        applyFilters({ page: 1 });
     }
 
-    function handlePerPageChange(perPage: number) {
-        setData('per_page', perPage);
-        setData('page', 1);
-        get(route('categories.index'), {
-            preserveState: true,
-        });
+    function handlePerPageChange(newPerPage: number) {
+        applyFilters({ per_page: newPerPage, page: 1 });
     }
 
-    function handlePageChange(page: number) {
-        setData('page', page);
-        get(route('categories.index'), {
-            preserveState: true,
-        });
+    function handlePageChange(newPage: number) {
+        applyFilters({ page: newPage });
     }
 
     function clearFilters() {
-        setData({
-            search: '',
-            sort_field: 'created_at',
-            sort_direction: 'desc',
-            page: 1,
-            per_page: 10,
-        });
-        get(route('categories.index'), {
-            preserveState: true,
+        // Resetear todos los filtros a los valores por defecto
+        setFilterState(defaultFilters);
+
+        // Limpiar todos los filtros en la URL
+        router.get(route('categories.index'), {}, {
+            preserveState: false,
+            replace: true
         });
     }
 
-    function handleSort(field: string) {
-        const direction = data.sort_field === field && data.sort_direction === 'asc' ? 'desc' : 'asc';
-        setData({
-            ...data,
-            sort_field: field,
-            sort_direction: direction,
-        });
-        get(route('categories.index'), {
-            preserveState: true,
+    function handleSort(sorter: SorterResult<Category> | SorterResult<Category>[]) {
+        const { field, order } = Array.isArray(sorter) ? sorter[0] : sorter;
+
+        if (!field) return;
+
+        let newSortField: string;
+        let newSortDirection: 'asc' | 'desc';
+
+        // Si order es undefined (tercer click), volvemos al orden predeterminado
+        if (order === undefined) {
+            newSortField = 'created_at';
+            newSortDirection = 'desc';
+        } else {
+            // Normal: ascendente o descendente
+            newSortField = field as string;
+            newSortDirection = order === 'ascend' ? 'asc' : 'desc';
+        }
+
+        applyFilters({
+            sort_field: newSortField,
+            sort_direction: newSortDirection
         });
     }
 
-    // Función para mostrar el indicador de dirección de ordenamiento
-    function getSortIndicator(field: string) {
-        if (data.sort_field !== field) return null;
-        return data.sort_direction === 'asc' ? '↑' : '↓';
-    }
+    // Configuración de las columnas para la tabla de Ant Design
+    const columns: ColumnsType<Category> = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            sorter: true,
+            sortOrder: filterState.sort_field === 'id'
+                ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+                : null,
+            width: 80,
+        },
+        {
+            title: 'Nombre',
+            dataIndex: 'name',
+            key: 'name',
+            sorter: true,
+            sortOrder: filterState.sort_field === 'name'
+                ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+                : null,
+            render: (text) => <Tooltip title={text}><span className="cursor-pointer">{text}</span></Tooltip>,
+        },
+        {
+            title: 'Creado',
+            dataIndex: 'created_at',
+            key: 'created_at',
+            sorter: true,
+            sortOrder: filterState.sort_field === 'created_at'
+                ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+                : null,
+            render: (date) => new Date(date).toLocaleDateString(),
+        },
+        {
+            title: 'Acciones',
+            key: 'actions',
+            width: 120,
+            render: (_, record) => (
+                <Space size="small">
+                    <Link href={route('categories.show', record.id)}>
+                        <AntButton
+                            type="text"
+                            icon={<EyeOutlined />}
+                            title="Ver"
+                        />
+                    </Link>
+                    <Link href={route('categories.edit', record.id)}>
+                        <AntButton
+                            type="text"
+                            icon={<EditOutlined />}
+                            title="Editar"
+                        />
+                    </Link>
+                </Space>
+            ),
+        },
+    ];
+
+    // Manejador para cambios en la tabla (ordenamiento y paginación)
+    const handleTableChange = (
+        pagination: TablePaginationConfig,
+        _: Record<string, FilterValue | null>,
+        sorter: SorterResult<Category> | SorterResult<Category>[]
+    ) => {
+        // Manejar cambios de página
+        if (pagination.current) {
+            handlePageChange(pagination.current);
+        }
+
+        // Manejar cambios de elementos por página
+        if (pagination.pageSize && pagination.pageSize !== filterState.per_page) {
+            handlePerPageChange(pagination.pageSize);
+        }
+
+        // Manejar cambios de ordenamiento
+        if (sorter) {
+            // Extraer la información de orden (puede ser un array o un objeto único)
+            const sorterObj = Array.isArray(sorter) ? sorter[0] : sorter;
+
+            // Pasar al manejador de ordenamiento siempre, incluso si no hay orden (para resetear)
+            handleSort(sorterObj);
+        }
+    };
+
+    // Verificar si hay filtros activos
+    const hasActiveFilters = () => {
+        return !!(
+            filterState.search ||
+            filterState.sort_field !== 'created_at' ||
+            filterState.sort_direction !== 'desc' ||
+            filterState.per_page !== 10
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -121,128 +260,66 @@ export default function CategoryList({ categories, filters }: Props) {
                             <CardTitle>Lista de Categorías</CardTitle>
                             <div className="flex space-x-2">
                                 <form onSubmit={handleSearch} className="flex space-x-2">
-                                    <Input
+                                    <AntInput
                                         placeholder="Buscar categorías..."
-                                        value={data.search}
-                                        onChange={e => setData('search', e.target.value)}
-                                        className="w-64"
+                                        value={filterState.search}
+                                        onChange={e => updateFilter('search', e.target.value)}
+                                        style={{ width: 200 }}
+                                        prefix={<SearchOutlined />}
+                                        allowClear
                                     />
-                                    <Button type="submit" disabled={processing}>
-                                        Buscar
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={clearFilters}
-                                        disabled={processing}
+                                    <AntButton
+                                        type="primary"
+                                        htmlType="submit"
+                                        loading={loading}
                                     >
-                                        Limpiar Filtros
-                                    </Button>
+                                        Buscar
+                                    </AntButton>
+                                    <AntButton
+                                        onClick={clearFilters}
+                                        disabled={loading}
+                                        danger={hasActiveFilters()}
+                                        icon={<ClearOutlined />}
+                                    >
+                                        Limpiar
+                                    </AntButton>
                                 </form>
-                                <Button asChild>
-                                    <Link href={route('categories.create')}>
+                                <Link href={route('categories.create')}>
+                                    <AntButton type="primary" icon={<PlusOutlined />}>
                                         Crear Categoría
-                                    </Link>
-                                </Button>
+                                    </AntButton>
+                                </Link>
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="overflow-x-auto">
-                                <table className="w-full border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100 dark:bg-gray-800">
-                                            <th className="px-4 py-2 text-left">
-                                                <button
-                                                    onClick={() => handleSort('id')}
-                                                    className="font-semibold text-sm uppercase flex items-center"
-                                                >
-                                                    ID {getSortIndicator('id')}
-                                                </button>
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                <button
-                                                    onClick={() => handleSort('name')}
-                                                    className="font-semibold text-sm uppercase flex items-center"
-                                                >
-                                                    Nombre {getSortIndicator('name')}
-                                                </button>
-                                            </th>
-                                            <th className="px-4 py-2 text-left">
-                                                <button
-                                                    onClick={() => handleSort('created_at')}
-                                                    className="font-semibold text-sm uppercase flex items-center"
-                                                >
-                                                    Creado {getSortIndicator('created_at')}
-                                                </button>
-                                            </th>
-                                            <th className="px-4 py-2 text-right">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {categories.data.map((category) => (
-                                            <tr key={category.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900">
-                                                <td className="px-4 py-3">{category.id}</td>
-                                                <td className="px-4 py-3">{category.name}</td>
-                                                <td className="px-4 py-3 text-sm">
-                                                    {new Date(category.created_at).toLocaleDateString()}
-                                                </td>
-                                                <td className="px-4 py-3 text-right space-x-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        asChild
-                                                    >
-                                                        <Link href={route('categories.show', category.id)}>
-                                                            Ver
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        asChild
-                                                    >
-                                                        <Link href={route('categories.edit', category.id)}>
-                                                            Editar
-                                                        </Link>
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {categories.data.length === 0 && (
-                                <div className="text-center py-8">
-                                    <p className="text-gray-500 dark:text-gray-400">
-                                        No se encontraron categorías
-                                    </p>
-                                </div>
-                            )}
+                            <Table
+                                columns={columns}
+                                dataSource={categories.data}
+                                rowKey="id"
+                                pagination={false}
+                                onChange={handleTableChange}
+                                loading={loading}
+                                size="middle"
+                                bordered
+                                sortDirections={['ascend', 'descend', 'ascend']}
+                                locale={{ emptyText: 'No se encontraron categorías' }}
+                            />
 
                             {categories.last_page > 1 && (
-                                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between">
+                                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between">
                                     <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-0">
                                         Mostrando {categories.from} a {categories.to} de {categories.total} resultados
                                     </div>
                                     <Pagination
-                                        currentPage={categories.current_page}
-                                        totalPages={categories.last_page}
-                                        onPageChange={handlePageChange}
+                                        current={categories.current_page}
+                                        total={categories.total}
+                                        pageSize={categories.per_page}
+                                        onChange={handlePageChange}
+                                        showSizeChanger
+                                        onShowSizeChange={(_, size) => handlePerPageChange(size)}
+                                        pageSizeOptions={['10', '25', '50', '100']}
+                                        showTotal={(total, range) => `${range[0]}-${range[1]} de ${total} registros`}
                                     />
-                                    <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                                        <span className="text-sm text-gray-500 dark:text-gray-400">Mostrar:</span>
-                                        <select
-                                            value={data.per_page}
-                                            onChange={(e) => handlePerPageChange(Number(e.target.value))}
-                                            className="border rounded p-1 text-sm"
-                                        >
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
-                                    </div>
                                 </div>
                             )}
                         </CardContent>
