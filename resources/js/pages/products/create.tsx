@@ -3,14 +3,14 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Category } from '@/types';
+import { Category } from '@/types/categories';
 import {
     Form,
     Input,
     InputNumber,
     Upload,
     Button as AntButton,
-    Checkbox,
+    Select,
     Space,
     message,
     Card as AntCard,
@@ -22,6 +22,7 @@ import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
 const { Title } = Typography;
+const { Option } = Select;
 
 interface Props {
     categories: Category[];
@@ -60,12 +61,8 @@ export default function CreateProduct({ categories }: Props) {
         });
     };
 
-    const handleCategoryChange = (categoryId: number, checked: boolean) => {
-        const updatedCategories = checked
-            ? [...data.category_ids, categoryId]
-            : data.category_ids.filter((id) => id !== categoryId);
-
-        setData('category_ids', updatedCategories);
+    const handleCategoryChange = (values: number[]) => {
+        setData('category_ids', values);
     };
 
     const handleImageUpload: UploadProps['onChange'] = ({ file }) => {
@@ -102,6 +99,7 @@ export default function CreateProduct({ categories }: Props) {
                                     description: data.description,
                                     price: data.price ? parseFloat(data.price) : undefined,
                                     stock: data.stock ? parseInt(data.stock) : undefined,
+                                    category_ids: data.category_ids,
                                 }}
                             >
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -173,20 +171,24 @@ export default function CreateProduct({ categories }: Props) {
 
                                 <Divider orientation="left">Categorías</Divider>
                                 <Form.Item
+                                    name="category_ids"
                                     validateStatus={errors.category_ids ? 'error' : ''}
                                     help={errors.category_ids}
                                 >
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                        {categories.map((category) => (
-                                            <Checkbox
-                                                key={category.id}
-                                                checked={data.category_ids.includes(category.id)}
-                                                onChange={(e) => handleCategoryChange(category.id, e.target.checked)}
-                                            >
+                                    <Select
+                                        mode="multiple"
+                                        placeholder="Seleccione categorías"
+                                        style={{ width: '100%' }}
+                                        value={data.category_ids}
+                                        onChange={handleCategoryChange}
+                                        optionFilterProp="children"
+                                    >
+                                        {categories.map(category => (
+                                            <Option key={category.id} value={category.id}>
                                                 {category.name}
-                                            </Checkbox>
+                                            </Option>
                                         ))}
-                                    </div>
+                                    </Select>
                                 </Form.Item>
 
                                 <Form.Item

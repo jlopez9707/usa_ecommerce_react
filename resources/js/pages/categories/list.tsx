@@ -8,13 +8,7 @@ import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined 
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { router } from '@inertiajs/react';
-
-interface Category {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
+import { Category } from '@/types/categories';
 
 interface FilterState {
     search: string;
@@ -64,11 +58,11 @@ const defaultFilters: FilterState = {
 export default function CategoryList({ categories, filters }: Props) {
     // Estado único para todos los filtros
     const [filterState, setFilterState] = useState<FilterState>({
-        search: filters.search || '',
-        sort_field: filters.sort_field || 'created_at',
-        sort_direction: filters.sort_direction || 'desc',
-        page: filters.page || 1,
-        per_page: filters.per_page || 10
+        search: filters.search ?? '',
+        sort_field: filters.sort_field ?? 'created_at',
+        sort_direction: filters.sort_direction ?? 'desc',
+        page: filters.page ?? 1,
+        per_page: filters.per_page ?? 10
     });
     const [loading, setLoading] = useState(false);
 
