@@ -12,7 +12,7 @@ import {
     Button as AntButton,
     Select,
     Space,
-    message,
+    notification,
     Card as AntCard,
     Divider,
     Typography
@@ -48,9 +48,17 @@ export default function CreateProduct({ categories }: Props) {
     });
 
     const [form] = Form.useForm();
-    const [messageApi, contextHolder] = message.useMessage();
+    const [notificationApi, contextHolder] = notification.useNotification();
 
     const handleSubmit = () => {
+        // Mostrar notificación antes de enviar (para que se vea aunque haya redirección)
+        notificationApi.success({
+            message: 'Procesando',
+            description: 'Creando producto...',
+            placement: 'topRight',
+            duration: 2
+        });
+
         const formData = new FormData();
         formData.append('name', data.name);
         formData.append('description', data.description);
@@ -76,11 +84,18 @@ export default function CreateProduct({ categories }: Props) {
         post(route('products.store'), {
             data: formData,
             onSuccess: () => {
-                messageApi.success('Producto creado exitosamente');
+                // No es necesario mostrar notificación aquí, ya se mostrará con el flash message
             },
             onError: () => {
-                messageApi.error('Error al crear el producto');
-            }
+                notificationApi.error({
+                    message: 'Error al crear',
+                    description: 'Hubo un problema al crear el producto',
+                    placement: 'topRight',
+                    duration: 4
+                });
+            },
+            // Preservar el flash después de la redirección
+            preserveScroll: true
         });
     };
 
@@ -100,7 +115,11 @@ export default function CreateProduct({ categories }: Props) {
         beforeUpload: (file: File) => {
             const isImage = file.type.startsWith('image/');
             if (!isImage) {
-                messageApi.error('Solo se permiten archivos de imagen');
+                notificationApi.error({
+                    message: 'Error de archivo',
+                    description: 'Solo se permiten archivos de imagen',
+                    placement: 'topRight'
+                });
                 return Upload.LIST_IGNORE;
             }
             return false;

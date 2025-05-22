@@ -11,7 +11,7 @@ import {
     Button as AntButton,
     Select,
     Space,
-    message,
+    notification,
     Divider,
 } from 'antd';
 import { UploadOutlined, SaveOutlined, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -57,20 +57,36 @@ export default function EditProduct({ product, categories }: Props) {
         });
     }, []);
 
-    const [messageApi, contextHolder] = message.useMessage();
+    const [notificationApi, contextHolder] = notification.useNotification();
 
     const handleSubmit = () => {
+        // Mostrar notificación antes de enviar (para que se vea aunque haya redirección)
+        notificationApi.success({
+            message: 'Procesando',
+            description: 'Actualizando producto...',
+            placement: 'topRight',
+            duration: 2
+        });
+
         // En lugar de usar put directamente, usamos post con método spoofing
         post(route('products.update', product.id), {
             forceFormData: true,
             onSuccess: () => {
-                messageApi.success('Producto actualizado exitosamente');
                 // Limpiar imágenes después de guardar
                 setData('newImages', []);
+
+                // No es necesario mostrar notificación aquí, ya se mostrará con el flash message
             },
             onError: () => {
-                messageApi.error('Error al actualizar el producto');
+                notificationApi.error({
+                    message: 'Error al actualizar',
+                    description: 'Hubo un problema al actualizar el producto',
+                    placement: 'topRight',
+                    duration: 4
+                });
             },
+            // Preservar el flash después de la redirección
+            preserveScroll: true
         });
     };
 
@@ -91,7 +107,11 @@ export default function EditProduct({ product, categories }: Props) {
 
         // Mensaje para confirmar al usuario
         if (files.length > 0) {
-            messageApi.success(`${files.length} imagen(es) lista(s) para subir`);
+            notificationApi.success({
+                message: 'Imágenes seleccionadas',
+                description: `${files.length} imagen(es) lista(s) para subir`,
+                placement: 'topRight'
+            });
         }
     };
 
@@ -99,7 +119,11 @@ export default function EditProduct({ product, categories }: Props) {
         // Eliminación directa sin confirmación
         const updatedDeleteIds = [...data.deleteImageIds, imageId];
         setData('deleteImageIds', updatedDeleteIds);
-        messageApi.success('Imagen marcada para eliminación');
+        notificationApi.success({
+            message: 'Imagen marcada',
+            description: 'Imagen marcada para eliminación',
+            placement: 'topRight'
+        });
         console.log('Imágenes a eliminar:', updatedDeleteIds);
     };
 
@@ -107,7 +131,11 @@ export default function EditProduct({ product, categories }: Props) {
         beforeUpload: (file: File) => {
             const isImage = file.type.startsWith('image/');
             if (!isImage) {
-                messageApi.error('Solo se permiten archivos de imagen');
+                notificationApi.error({
+                    message: 'Error de archivo',
+                    description: 'Solo se permiten archivos de imagen',
+                    placement: 'topRight'
+                });
                 return Upload.LIST_IGNORE;
             }
             return false; // Evitar subida automática

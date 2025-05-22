@@ -1,9 +1,9 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, PageProps } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useState } from 'react';
-import { Table, Input as AntInput, Button as AntButton, Tag, Space, Tooltip, Pagination } from 'antd';
+import { useState, useEffect } from 'react';
+import { Table, Input as AntInput, Button as AntButton, Tag, Space, Tooltip, Pagination, notification } from 'antd';
 import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
@@ -65,6 +65,8 @@ const defaultFilters: FilterState = {
 };
 
 export default function ProductList({ products, filters }: Props) {
+    const { flash = {} } = usePage<PageProps>().props;
+    const [notificationApi, contextHolder] = notification.useNotification();
     const [filterState, setFilterState] = useState<FilterState>({
         search: filters.search || '',
         category: filters.category || '',
@@ -76,6 +78,28 @@ export default function ProductList({ products, filters }: Props) {
         per_page: filters.per_page || 10
     });
     const [loading, setLoading] = useState(false);
+
+    // Mostrar notificaciones flash cuando se carga el componente
+    useEffect(() => {
+        // Solo mostrar la notificación si existe y tiene contenido
+        if (flash?.success && typeof flash.success === 'string' && flash.success.trim() !== '') {
+            notificationApi.success({
+                message: 'Éxito',
+                description: flash.success,
+                placement: 'topRight',
+                duration: 4
+            });
+        }
+
+        if (flash?.error && typeof flash.error === 'string' && flash.error.trim() !== '') {
+            notificationApi.error({
+                message: 'Error',
+                description: flash.error,
+                placement: 'topRight',
+                duration: 4
+            });
+        }
+    }, [flash]);
 
     // Función para actualizar un campo específico del estado
     const updateFilter = (field: keyof FilterState, value: string | number) => {
@@ -287,6 +311,7 @@ export default function ProductList({ products, filters }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Lista de Productos" />
+            {contextHolder}
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>

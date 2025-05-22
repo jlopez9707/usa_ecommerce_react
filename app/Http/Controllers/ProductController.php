@@ -91,13 +91,6 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        // Depuración de los datos recibidos
-        Log::info('Datos recibidos en el controlador para actualizar producto', [
-            'tiene_imagenes' => $request->hasFile('newImages'),
-            'archivos' => $request->allFiles(),
-            'todos_los_datos' => $request->all(),
-        ]);
-
         $this->updateProductAction->execute($product, $request->validated());
 
         return redirect()->route('products.index')
