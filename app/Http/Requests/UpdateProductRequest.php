@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -28,7 +28,7 @@ class UpdateProductRequest extends FormRequest
             'description' => 'sometimes|required|string',
             'price' => 'sometimes|required|numeric|min:0',
             'newImages' => 'sometimes|array',
-            'newImages.*' => 'image|max:2048',
+            'newImages.*' => 'sometimes|image|max:2048',
             'deleteImageIds' => 'sometimes|array',
             'deleteImageIds.*' => 'numeric|exists:images,id',
             'stock' => 'sometimes|required|integer|min:0',
@@ -43,16 +43,13 @@ class UpdateProductRequest extends FormRequest
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
      *
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(
-            response()->json([
-                'errors' => $validator->errors(),
-                'message' => 'Los datos proporcionados no son válidos'
-            ], 422)
-        );
+        // Deja que Laravel maneje la validación de forma estándar
+        // Esto permitirá que Inertia.js muestre los errores correctamente
+        parent::failedValidation($validator);
     }
 
     /**

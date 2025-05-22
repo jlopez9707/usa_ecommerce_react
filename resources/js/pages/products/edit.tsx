@@ -3,7 +3,6 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BreadcrumbItem, Category } from '@/types';
 import { Product } from '@/types/product';
-import { useState } from 'react';
 import {
     Form,
     Input,
@@ -14,14 +13,12 @@ import {
     Space,
     message,
     Divider,
-    Typography,
-    Modal
 } from 'antd';
 import { UploadOutlined, SaveOutlined, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
+import type { UploadFile, UploadProps, UploadListType } from 'antd/es/upload/interface';
+import React from 'react';
 
 const { TextArea } = Input;
-const { Title } = Typography;
 const { Option } = Select;
 
 interface Props {
@@ -46,6 +43,18 @@ export default function EditProduct({ product, categories }: Props) {
     });
 
     const [form] = Form.useForm();
+
+    // Establecer valores iniciales del formulario cuando se carga el componente
+    React.useEffect(() => {
+        form.setFieldsValue({
+            name: data.name,
+            description: data.description,
+            price: data.price ? parseFloat(data.price) : undefined,
+            stock: data.stock ? parseInt(data.stock) : undefined,
+            category_ids: data.category_ids,
+        });
+    }, []);
+
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleSubmit = () => {
@@ -57,33 +66,62 @@ export default function EditProduct({ product, categories }: Props) {
         formData.append('_method', 'PUT'); // Para simular PUT request
 
         // Añadir nuevas imágenes
-        data.newImages.forEach((image, index) => {
-            formData.append(`newImages[${index}]`, image);
-        });
+        console.log('Enviando nuevas imágenes:', data.newImages.length);
+        if (data.newImages.length > 0) {
+            data.newImages.forEach((image) => {
+                // Usar el formato estándar de Laravel para arrays en FormData
+                formData.append('newImages[]', image);
+            });
+        }
 
         // Añadir IDs de imágenes a eliminar
         data.deleteImageIds.forEach(id => {
             formData.append('deleteImageIds[]', id.toString());
         });
 
-        // Añadir categorías
-        data.category_ids.forEach(id => {
+        // Añadir categorías - asegurarse de que haya al menos una categoría
+        const categoriesToSend = (data.category_ids && data.category_ids.length > 0)
+            ? data.category_ids
+            : product.categories.map(category => category.id);
+
+        console.log('Categorías que se enviarán:', categoriesToSend);
+
+        categoriesToSend.forEach(id => {
             formData.append('category_ids[]', id.toString());
         });
 
-        // Enviar formulario
+        // Imprimir todos los datos que se enviarán para depuración
+        console.log('Datos del formulario que se enviarán:');
+        console.log('- Nombre:', data.name);
+        console.log('- Descripción:', data.description);
+        console.log('- Precio:', data.price);
+        console.log('- Stock:', data.stock);
+        console.log('- Nuevas imágenes:', data.newImages.length);
+        console.log('- IDs de imágenes a eliminar:', data.deleteImageIds);
+        console.log('- IDs de categorías:', categoriesToSend);
+
+        // Enviar formulario usando Inertia.js
         put(route('products.update', product.id), {
             data: formData,
             onSuccess: () => {
                 messageApi.success('Producto actualizado exitosamente');
+                // Actualizar el estado local en lugar de recargar la página
+                setData('newImages', []);
+
+                // Obtener producto actualizado del servidor
+                // (Esto ya lo hace Inertia automáticamente)
             },
-            onError: () => {
+            onError: (errors) => {
                 messageApi.error('Error al actualizar el producto');
-            }
+                console.error('Errores de validación:', errors);
+            },
+            preserveState: true,  // Mantener el estado actual
+            preserveScroll: true  // Mantener la posición de desplazamiento
         });
     };
 
     const handleCategoryChange = (values: number[]) => {
+        console.log('Categorías seleccionadas:', values);
         setData('category_ids', values);
     };
 
@@ -92,21 +130,23 @@ export default function EditProduct({ product, categories }: Props) {
             .filter(file => !!file.originFileObj)
             .map(file => file.originFileObj) as File[];
 
+        console.log('Nuevas imágenes para subir:', files.length);
+        console.log('Nombres de archivos:', files.map(f => f.name));
+
         setData('newImages', files);
+
+        // Mensaje para confirmar al usuario
+        if (files.length > 0) {
+            messageApi.success(`${files.length} imagen(es) lista(s) para subir`);
+        }
     };
 
-    const confirmDeleteImage = (imageId: number) => {
-        Modal.confirm({
-            title: '¿Estás seguro que deseas eliminar esta imagen?',
-            content: 'Esta acción no se puede deshacer.',
-            okText: 'Eliminar',
-            okType: 'danger',
-            cancelText: 'Cancelar',
-            onOk() {
-                const updatedDeleteIds = [...data.deleteImageIds, imageId];
-                setData('deleteImageIds', updatedDeleteIds);
-            },
-        });
+    const handleDeleteImage = (imageId: number) => {
+        // Eliminación directa sin confirmación
+        const updatedDeleteIds = [...data.deleteImageIds, imageId];
+        setData('deleteImageIds', updatedDeleteIds);
+        messageApi.success('Imagen marcada para eliminación');
+        console.log('Imágenes a eliminar:', updatedDeleteIds);
     };
 
     const uploadProps = {
@@ -116,7 +156,7 @@ export default function EditProduct({ product, categories }: Props) {
                 messageApi.error('Solo se permiten archivos de imagen');
                 return Upload.LIST_IGNORE;
             }
-            return false;
+            return false; // Evitar subida automática
         },
         fileList: data.newImages.map((file, index) => ({
             uid: `-${index}`,
@@ -126,13 +166,15 @@ export default function EditProduct({ product, categories }: Props) {
         })) as UploadFile[],
         onChange: handleNewImagesUpload,
         multiple: true,
-        listType: 'picture-card',
+        listType: 'picture-card' as UploadListType,
+        accept: 'image/*',
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Editar Producto" />
             {contextHolder}
+
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>
@@ -208,28 +250,35 @@ export default function EditProduct({ product, categories }: Props) {
                                     <div className="mb-6">
                                         <Divider orientation="left">Imágenes Actuales</Divider>
                                         <div className="flex flex-wrap gap-4">
-                                            {product.images.map(image => (
-                                                !data.deleteImageIds.includes(image.id) && (
-                                                    <div key={image.id} className="relative">
-                                                <img
-                                                            src={`/storage/${image.url}`}
-                                                    alt={product.name}
-                                                    className="w-32 h-32 object-cover rounded"
-                                                />
-                                                        <AntButton
-                                                            type="primary"
-                                                            danger
-                                                            icon={<DeleteOutlined />}
-                                                            size="small"
-                                                            className="absolute -top-2 -right-2"
-                                                            onClick={() => confirmDeleteImage(image.id)}
-                                                        />
-                                                    </div>
-                                                )
-                                            ))}
+                                            {product.images.map(image => {
+                                                // Verificar si la imagen está marcada para eliminar
+                                                const isMarkedForDeletion = data.deleteImageIds.includes(image.id);
+
+                                                // Solo mostrar imágenes que no están marcadas para eliminar
+                                                if (!isMarkedForDeletion) {
+                                                    return (
+                                                        <div key={image.id} className="relative">
+                                                            <img
+                                                                src={`/storage/${image.url}`}
+                                                                alt={product.name}
+                                                                className="w-32 h-32 object-cover rounded"
+                                                            />
+                                                            <AntButton
+                                                                type="primary"
+                                                                danger
+                                                                icon={<DeleteOutlined />}
+                                                                size="small"
+                                                                className="absolute -top-2 -right-2"
+                                                                onClick={() => handleDeleteImage(image.id)}
+                                                            />
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            })}
                                         </div>
-                                            </div>
-                                        )}
+                                    </div>
+                                )}
 
                                 {/* Subir nuevas imágenes */}
                                 <Form.Item
@@ -244,13 +293,14 @@ export default function EditProduct({ product, categories }: Props) {
                                             <div style={{ marginTop: 8 }}>Subir imágenes</div>
                                         </div>
                                     </Upload>
-                                    </Form.Item>
+                                </Form.Item>
 
                                 <Divider orientation="left">Categorías</Divider>
                                 <Form.Item
                                     name="category_ids"
                                     validateStatus={errors.category_ids ? 'error' : ''}
                                     help={errors.category_ids}
+                                    rules={[{ required: true, message: 'Debe seleccionar al menos una categoría' }]}
                                 >
                                     <Select
                                         mode="multiple"
