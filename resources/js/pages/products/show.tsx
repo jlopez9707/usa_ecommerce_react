@@ -10,7 +10,8 @@ import {
     Typography,
     Image,
     Divider,
-    Space
+    Space,
+    Carousel
 } from 'antd';
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 
@@ -53,13 +54,23 @@ export default function ShowProduct({ product }: Props) {
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    {product.image && (
-                                        <Image
-                                            src={`/storage/${product.image}`}
-                                            alt={product.name}
-                                            className="rounded-lg"
-                                            style={{ maxHeight: '400px', objectFit: 'cover' }}
-                                        />
+                                    {product.images && product.images.length > 0 ? (
+                                        <Carousel autoplay className="mb-4">
+                                            {product.images.map((image) => (
+                                                <div key={image.id}>
+                                                    <Image
+                                                        src={`/storage/${image.url}`}
+                                                        alt={product.name}
+                                                        className="rounded-lg"
+                                                        style={{ maxHeight: '400px', objectFit: 'cover', margin: '0 auto' }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </Carousel>
+                                    ) : (
+                                        <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg">
+                                            <Text type="secondary">Sin imágenes</Text>
+                                        </div>
                                     )}
                                 </div>
                                 <div className="space-y-6">

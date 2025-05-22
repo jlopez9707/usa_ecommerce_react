@@ -70,7 +70,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load('categories');
+        $product->load(['categories', 'images']);
 
         return Inertia::render('products/show', [
             'product' => $product
@@ -79,7 +79,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $product->load('categories');
+        $product->load(['categories', 'images']);
         $categories = Category::all();
 
         return Inertia::render('products/edit', [

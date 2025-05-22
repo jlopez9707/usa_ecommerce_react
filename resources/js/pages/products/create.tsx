@@ -38,7 +38,7 @@ export default function CreateProduct({ categories }: Props) {
         name: '',
         description: '',
         price: '',
-        image: null as File | null,
+        images: [] as File[],
         measurements: {},
         stock: '',
         category_ids: [] as number[],
@@ -51,7 +51,30 @@ export default function CreateProduct({ categories }: Props) {
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleSubmit = () => {
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price', data.price);
+        formData.append('stock', data.stock);
+
+        // Añadir múltiples imágenes
+        data.images.forEach((image, index) => {
+            formData.append(`images[${index}]`, image);
+        });
+
+        // Añadir categorías
+        data.category_ids.forEach(id => {
+            formData.append('category_ids[]', id.toString());
+        });
+
+        // Añadir campos opcionales si existen
+        if (data.color) formData.append('color', data.color);
+        if (data.size) formData.append('size', data.size);
+        if (data.material) formData.append('material', data.material);
+
+        // Enviar formulario
         post(route('products.store'), {
+            data: formData,
             onSuccess: () => {
                 messageApi.success('Producto creado exitosamente');
             },
@@ -65,18 +88,32 @@ export default function CreateProduct({ categories }: Props) {
         setData('category_ids', values);
     };
 
-    const handleImageUpload: UploadProps['onChange'] = ({ file }) => {
-        if (file.originFileObj) {
-            setData('image', file.originFileObj);
-        }
+    const handleImagesUpload: UploadProps['onChange'] = ({ fileList }) => {
+        const files = fileList
+            .filter(file => !!file.originFileObj)
+            .map(file => file.originFileObj) as File[];
+
+        setData('images', files);
     };
 
     const uploadProps = {
         beforeUpload: (file: File) => {
-            setData('image', file);
+            const isImage = file.type.startsWith('image/');
+            if (!isImage) {
+                messageApi.error('Solo se permiten archivos de imagen');
+                return Upload.LIST_IGNORE;
+            }
             return false;
         },
-        fileList: data.image ? [{ uid: '-1', name: data.image.name, status: 'done' } as UploadFile] : [],
+        fileList: data.images.map((file, index) => ({
+            uid: `-${index}`,
+            name: file.name,
+            status: 'done',
+            url: URL.createObjectURL(file)
+        })) as UploadFile[],
+        onChange: handleImagesUpload,
+        multiple: true,
+        listType: 'picture-card',
     };
 
     return (
@@ -151,23 +188,21 @@ export default function CreateProduct({ categories }: Props) {
                                             onChange={(value) => setData('stock', value ? value.toString() : '')}
                                         />
                                     </Form.Item>
+                                </div>
 
                                     <Form.Item
-                                        label="Imagen"
-                                        name="image"
-                                        validateStatus={errors.image ? 'error' : ''}
-                                        help={errors.image}
+                                    label="Imágenes"
+                                    name="images"
+                                    validateStatus={errors.images ? 'error' : ''}
+                                    help={errors.images}
                                     >
-                                        <Upload
-                                            {...uploadProps}
-                                            onChange={handleImageUpload}
-                                            listType="picture"
-                                            maxCount={1}
-                                        >
-                                            <AntButton icon={<UploadOutlined />}>Seleccionar imagen</AntButton>
+                                    <Upload {...uploadProps}>
+                                        <div>
+                                            <UploadOutlined />
+                                            <div style={{ marginTop: 8 }}>Subir imágenes</div>
+                                        </div>
                                         </Upload>
                                     </Form.Item>
-                                </div>
 
                                 <Divider orientation="left">Categorías</Divider>
                                 <Form.Item

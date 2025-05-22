@@ -27,9 +27,12 @@ class UpdateProductRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string',
             'price' => 'sometimes|required|numeric|min:0',
-            'image' => 'sometimes|nullable|image|max:2048',
+            'newImages' => 'sometimes|array',
+            'newImages.*' => 'image|max:2048',
+            'deleteImageIds' => 'sometimes|array',
+            'deleteImageIds.*' => 'numeric|exists:images,id',
             'stock' => 'sometimes|required|integer|min:0',
-            'category_ids' => 'sometimes|array',
+            'category_ids' => 'sometimes|required|array|min:1',
             'category_ids.*' => 'exists:categories,id',
         ];
     }
@@ -65,10 +68,12 @@ class UpdateProductRequest extends FormRequest
             'price.required' => 'El precio es obligatorio',
             'price.numeric' => 'El precio debe ser un número',
             'price.min' => 'El precio no puede ser negativo',
-            'image.image' => 'El archivo debe ser una imagen',
+            'newImages.*.image' => 'Los archivos deben ser imágenes',
             'stock.required' => 'El stock es obligatorio',
             'stock.integer' => 'El stock debe ser un número entero',
             'stock.min' => 'El stock no puede ser negativo',
+            'category_ids.required' => 'Debe seleccionar al menos una categoría',
+            'category_ids.min' => 'Debe seleccionar al menos una categoría',
         ];
     }
 }

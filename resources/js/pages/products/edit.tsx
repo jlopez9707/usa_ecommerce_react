@@ -14,9 +14,10 @@ import {
     Space,
     message,
     Divider,
-    Typography
+    Typography,
+    Modal
 } from 'antd';
-import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { UploadOutlined, SaveOutlined, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
@@ -34,20 +35,45 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function EditProduct({ product, categories }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, put, processing, errors, delete: deleteImage } = useForm({
         name: product.name,
         description: product.description,
         price: product.price.toString(),
-        image: null as File | null,
+        newImages: [] as File[],
         stock: product.stock.toString(),
         category_ids: product.categories ? product.categories.map(cat => cat.id) : [],
+        deleteImageIds: [] as number[],
     });
 
     const [form] = Form.useForm();
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleSubmit = () => {
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price', data.price);
+        formData.append('stock', data.stock);
+        formData.append('_method', 'PUT'); // Para simular PUT request
+
+        // Añadir nuevas imágenes
+        data.newImages.forEach((image, index) => {
+            formData.append(`newImages[${index}]`, image);
+        });
+
+        // Añadir IDs de imágenes a eliminar
+        data.deleteImageIds.forEach(id => {
+            formData.append('deleteImageIds[]', id.toString());
+        });
+
+        // Añadir categorías
+        data.category_ids.forEach(id => {
+            formData.append('category_ids[]', id.toString());
+        });
+
+        // Enviar formulario
         put(route('products.update', product.id), {
+            data: formData,
             onSuccess: () => {
                 messageApi.success('Producto actualizado exitosamente');
             },
@@ -61,18 +87,46 @@ export default function EditProduct({ product, categories }: Props) {
         setData('category_ids', values);
     };
 
-    const handleImageUpload: UploadProps['onChange'] = ({ file }) => {
-        if (file.originFileObj) {
-            setData('image', file.originFileObj);
-        }
+    const handleNewImagesUpload: UploadProps['onChange'] = ({ fileList }) => {
+        const files = fileList
+            .filter(file => !!file.originFileObj)
+            .map(file => file.originFileObj) as File[];
+
+        setData('newImages', files);
+    };
+
+    const confirmDeleteImage = (imageId: number) => {
+        Modal.confirm({
+            title: '¿Estás seguro que deseas eliminar esta imagen?',
+            content: 'Esta acción no se puede deshacer.',
+            okText: 'Eliminar',
+            okType: 'danger',
+            cancelText: 'Cancelar',
+            onOk() {
+                const updatedDeleteIds = [...data.deleteImageIds, imageId];
+                setData('deleteImageIds', updatedDeleteIds);
+            },
+        });
     };
 
     const uploadProps = {
         beforeUpload: (file: File) => {
-            setData('image', file);
+            const isImage = file.type.startsWith('image/');
+            if (!isImage) {
+                messageApi.error('Solo se permiten archivos de imagen');
+                return Upload.LIST_IGNORE;
+            }
             return false;
         },
-        fileList: data.image ? [{ uid: '-1', name: data.image.name, status: 'done' } as UploadFile] : [],
+        fileList: data.newImages.map((file, index) => ({
+            uid: `-${index}`,
+            name: file.name,
+            status: 'done',
+            url: URL.createObjectURL(file)
+        })) as UploadFile[],
+        onChange: handleNewImagesUpload,
+        multiple: true,
+        listType: 'picture-card',
     };
 
     return (
@@ -147,32 +201,50 @@ export default function EditProduct({ product, categories }: Props) {
                                             onChange={(value) => setData('stock', value ? value.toString() : '')}
                                         />
                                     </Form.Item>
+                                </div>
 
-                                    <Form.Item
-                                        label="Imagen"
-                                        name="image"
-                                        validateStatus={errors.image ? 'error' : ''}
-                                        help={errors.image}
-                                    >
-                                        <Upload
-                                            {...uploadProps}
-                                            onChange={handleImageUpload}
-                                            listType="picture"
-                                            maxCount={1}
-                                        >
-                                            <AntButton icon={<UploadOutlined />}>Seleccionar imagen</AntButton>
-                                        </Upload>
-                                        {product.image && (
-                                            <div className="mt-2">
+                                {/* Imágenes existentes */}
+                                {product.images && product.images.length > 0 && (
+                                    <div className="mb-6">
+                                        <Divider orientation="left">Imágenes Actuales</Divider>
+                                        <div className="flex flex-wrap gap-4">
+                                            {product.images.map(image => (
+                                                !data.deleteImageIds.includes(image.id) && (
+                                                    <div key={image.id} className="relative">
                                                 <img
-                                                    src={`/storage/${product.image}`}
+                                                            src={`/storage/${image.url}`}
                                                     alt={product.name}
                                                     className="w-32 h-32 object-cover rounded"
                                                 />
+                                                        <AntButton
+                                                            type="primary"
+                                                            danger
+                                                            icon={<DeleteOutlined />}
+                                                            size="small"
+                                                            className="absolute -top-2 -right-2"
+                                                            onClick={() => confirmDeleteImage(image.id)}
+                                                        />
+                                                    </div>
+                                                )
+                                            ))}
+                                        </div>
                                             </div>
                                         )}
+
+                                {/* Subir nuevas imágenes */}
+                                <Form.Item
+                                    label="Nuevas Imágenes"
+                                    name="newImages"
+                                    validateStatus={errors.newImages ? 'error' : ''}
+                                    help={errors.newImages}
+                                >
+                                    <Upload {...uploadProps}>
+                                        <div>
+                                            <UploadOutlined />
+                                            <div style={{ marginTop: 8 }}>Subir imágenes</div>
+                                        </div>
+                                    </Upload>
                                     </Form.Item>
-                                </div>
 
                                 <Divider orientation="left">Categorías</Divider>
                                 <Form.Item
@@ -225,7 +297,7 @@ export default function EditProduct({ product, categories }: Props) {
                                             loading={processing}
                                             icon={<SaveOutlined />}
                                         >
-                                            {processing ? 'Guardando...' : 'Guardar Cambios'}
+                                            {processing ? 'Guardando...' : 'Actualizar Producto'}
                                         </AntButton>
                                     </Space>
                                 </Form.Item>

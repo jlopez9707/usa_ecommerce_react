@@ -65,7 +65,6 @@ const defaultFilters: FilterState = {
 };
 
 export default function ProductList({ products, filters }: Props) {
-    // Estado único para todos los filtros
     const [filterState, setFilterState] = useState<FilterState>({
         search: filters.search || '',
         category: filters.category || '',
