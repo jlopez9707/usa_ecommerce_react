@@ -1,7 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BreadcrumbItem, Category } from '@/types';
+import { BreadcrumbItem } from '@/types';
 import { Product } from '@/types/product';
 import {
     Form,
@@ -17,6 +17,7 @@ import {
 import { UploadOutlined, SaveOutlined, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps, UploadListType } from 'antd/es/upload/interface';
 import React from 'react';
+import { Category } from '@/types/categories';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -32,7 +33,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function EditProduct({ product, categories }: Props) {
-    const { data, setData, put, processing, errors, delete: deleteImage } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         name: product.name,
         description: product.description,
         price: product.price.toString(),
@@ -40,6 +41,7 @@ export default function EditProduct({ product, categories }: Props) {
         stock: product.stock.toString(),
         category_ids: product.categories ? product.categories.map(cat => cat.id) : [],
         deleteImageIds: [] as number[],
+        _method: 'PUT',
     });
 
     const [form] = Form.useForm();
@@ -58,65 +60,17 @@ export default function EditProduct({ product, categories }: Props) {
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleSubmit = () => {
-        const formData = new FormData();
-        formData.append('name', data.name);
-        formData.append('description', data.description);
-        formData.append('price', data.price);
-        formData.append('stock', data.stock);
-        formData.append('_method', 'PUT'); // Para simular PUT request
-
-        // Añadir nuevas imágenes
-        console.log('Enviando nuevas imágenes:', data.newImages.length);
-        if (data.newImages.length > 0) {
-            data.newImages.forEach((image) => {
-                // Usar el formato estándar de Laravel para arrays en FormData
-                formData.append('newImages[]', image);
-            });
-        }
-
-        // Añadir IDs de imágenes a eliminar
-        data.deleteImageIds.forEach(id => {
-            formData.append('deleteImageIds[]', id.toString());
-        });
-
-        // Añadir categorías - asegurarse de que haya al menos una categoría
-        const categoriesToSend = (data.category_ids && data.category_ids.length > 0)
-            ? data.category_ids
-            : product.categories.map(category => category.id);
-
-        console.log('Categorías que se enviarán:', categoriesToSend);
-
-        categoriesToSend.forEach(id => {
-            formData.append('category_ids[]', id.toString());
-        });
-
-        // Imprimir todos los datos que se enviarán para depuración
-        console.log('Datos del formulario que se enviarán:');
-        console.log('- Nombre:', data.name);
-        console.log('- Descripción:', data.description);
-        console.log('- Precio:', data.price);
-        console.log('- Stock:', data.stock);
-        console.log('- Nuevas imágenes:', data.newImages.length);
-        console.log('- IDs de imágenes a eliminar:', data.deleteImageIds);
-        console.log('- IDs de categorías:', categoriesToSend);
-
-        // Enviar formulario usando Inertia.js
-        put(route('products.update', product.id), {
-            data: formData,
+        // En lugar de usar put directamente, usamos post con método spoofing
+        post(route('products.update', product.id), {
+            forceFormData: true,
             onSuccess: () => {
                 messageApi.success('Producto actualizado exitosamente');
-                // Actualizar el estado local en lugar de recargar la página
+                // Limpiar imágenes después de guardar
                 setData('newImages', []);
-
-                // Obtener producto actualizado del servidor
-                // (Esto ya lo hace Inertia automáticamente)
             },
-            onError: (errors) => {
+            onError: () => {
                 messageApi.error('Error al actualizar el producto');
-                console.error('Errores de validación:', errors);
             },
-            preserveState: true,  // Mantener el estado actual
-            preserveScroll: true  // Mantener la posición de desplazamiento
         });
     };
 
