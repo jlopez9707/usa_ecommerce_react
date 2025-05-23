@@ -24,7 +24,7 @@ export default function EditCategory({ category }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('categories.update', category.id));
+        put(route('admin.categories.update', category.id));
     };
 
     return (

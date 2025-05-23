@@ -1,8 +1,3 @@
-export interface BreadcrumbItem {
-    title: string;
-    href: string;
-}
-
 export interface Category {
     id: number;
     name: string;

@@ -25,10 +25,26 @@ class StoreProductRequest extends FormRequest
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'image' => 'required|image|max:2048',
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|max:2048',
             'stock' => 'required|integer|min:0',
-            'category_ids' => 'sometimes|array',
+            'category_ids' => 'required|array|min:1',
             'category_ids.*' => 'exists:categories,id',
+        ];
+    }
+
+    /**
+     * Get custom error messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'category_ids.required' => 'Debe seleccionar al menos una categoría',
+            'category_ids.min' => 'Debe seleccionar al menos una categoría',
+            'images.required' => 'Debe subir al menos una imagen',
+            'images.min' => 'Debe subir al menos una imagen',
         ];
     }
 }

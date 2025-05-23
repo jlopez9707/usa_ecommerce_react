@@ -19,7 +19,7 @@ export default function CreateCategory() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('categories.store'));
+        post(route('admin.categories.store'));
     };
 
     return (

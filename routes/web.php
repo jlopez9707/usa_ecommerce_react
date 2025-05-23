@@ -14,9 +14,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::resource('products', ProductController::class);
-    Route::resource('categories', CategoryController::class);
-    Route::resource('store-settings', StoreSettingController::class)->names("storeSettings");
+    // Admin routes
+    Route::prefix('admin')->group(function () {
+        Route::resource('products', ProductController::class)->names('admin.products');
+        Route::resource('categories', CategoryController::class)->names('admin.categories');
+        Route::resource('store-settings', StoreSettingController::class)->names("storeSettings");
+    });
 });
 
 require __DIR__.'/settings.php';

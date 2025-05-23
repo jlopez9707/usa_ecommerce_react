@@ -41,7 +41,7 @@ class CategoryController extends Controller
             'per_page'
         ]);
 
-        return Inertia::render('categories/list', [
+        return Inertia::render('admin/categories/list', [
             'categories' => $this->getCategoriesAction->execute($filters),
             'filters' => $filters,
         ]);
@@ -49,27 +49,27 @@ class CategoryController extends Controller
 
     public function create()
     {
-        return Inertia::render('categories/create');
+        return Inertia::render('admin/categories/create');
     }
 
     public function store(StoreCategoryRequest $request)
     {
         $this->storeCategoryAction->execute($request->validated());
 
-        return redirect()->route('categories.index')
+        return redirect()->route('admin.categories.index')
             ->with('success', 'Categoría creada exitosamente');
     }
 
     public function show(Category $category)
     {
-        return Inertia::render('categories/show', [
+        return Inertia::render('admin/categories/show', [
             'category' => $category
         ]);
     }
 
     public function edit(Category $category)
     {
-        return Inertia::render('categories/edit', [
+        return Inertia::render('admin/categories/edit', [
             'category' => $category
         ]);
     }
@@ -78,7 +78,7 @@ class CategoryController extends Controller
     {
         $this->updateCategoryAction->execute($category, $request->validated());
 
-        return redirect()->route('categories.index')
+        return redirect()->route('admin.categories.index')
             ->with('success', 'Categoría actualizada exitosamente');
     }
 
@@ -86,7 +86,7 @@ class CategoryController extends Controller
     {
         $this->deleteCategoryAction->execute($category);
 
-        return redirect()->route('categories.index')
+        return redirect()->route('admin.categories.index')
             ->with('success', 'Categoría eliminada exitosamente');
     }
 }

@@ -28,7 +28,7 @@ export default function ShowCategory({ category }: Props) {
                                     variant="outline"
                                     asChild
                                 >
-                                    <Link href={route('categories.edit', category.id)}>
+                                    <Link href={route('admin.categories.edit', category.id)}>
                                         Editar
                                     </Link>
                                 </Button>
@@ -36,7 +36,7 @@ export default function ShowCategory({ category }: Props) {
                                     variant="outline"
                                     asChild
                                 >
-                                    <Link href={route('categories.index')}>
+                                    <Link href={route('admin.categories.index')}>
                                         Volver
                                     </Link>
                                 </Button>

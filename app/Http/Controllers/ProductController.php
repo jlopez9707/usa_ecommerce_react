@@ -12,6 +12,7 @@ use App\Actions\Products\DeleteProductAction;
 use App\Actions\Products\GetProductsAction;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -45,7 +46,7 @@ class ProductController extends Controller
             'per_page'
         ]);
 
-        return Inertia::render('products/list', [
+        return Inertia::render('admin/products/list', [
             'products' => $this->getProductsAction->execute($filters),
             'filters' => $filters,
         ]);
@@ -55,7 +56,7 @@ class ProductController extends Controller
     {
         $categories = Category::all();
 
-        return Inertia::render('products/create', [
+        return Inertia::render('admin/products/create', [
             'categories' => $categories
         ]);
     }
@@ -64,25 +65,25 @@ class ProductController extends Controller
     {
         $this->storeProductAction->execute($request->validated());
 
-        return redirect()->route('products.index')
+        return redirect()->route('admin.products.index')
             ->with('success', 'Producto creado exitosamente');
     }
 
     public function show(Product $product)
     {
-        $product->load('categories');
+        $product->load(['categories', 'images']);
 
-        return Inertia::render('products/show', [
+        return Inertia::render('admin/products/show', [
             'product' => $product
         ]);
     }
 
     public function edit(Product $product)
     {
-        $product->load('categories');
+        $product->load(['categories', 'images']);
         $categories = Category::all();
 
-        return Inertia::render('products/edit', [
+        return Inertia::render('admin/products/edit', [
             'product' => $product,
             'categories' => $categories
         ]);
@@ -92,7 +93,7 @@ class ProductController extends Controller
     {
         $this->updateProductAction->execute($product, $request->validated());
 
-        return redirect()->route('products.index')
+        return redirect()->route('admin.products.index')
             ->with('success', 'Producto actualizado exitosamente');
     }
 
@@ -100,7 +101,7 @@ class ProductController extends Controller
     {
         $this->deleteProductAction->execute($product);
 
-        return redirect()->route('products.index')
+        return redirect()->route('admin.products.index')
             ->with('success', 'Producto eliminado exitosamente');
     }
 }

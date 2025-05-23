@@ -15,7 +15,7 @@ class GetProductsAction
      */
     public function execute(array $filters = []): LengthAwarePaginator
     {
-        $query = Product::query();
+        $query = Product::with('images');
 
         // Apply filters
         if (isset($filters['category'])) {

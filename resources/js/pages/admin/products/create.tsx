@@ -3,16 +3,16 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Category } from '@/types';
+import { Category } from '@/types/categories';
 import {
     Form,
     Input,
     InputNumber,
     Upload,
     Button as AntButton,
-    Checkbox,
+    Select,
     Space,
-    message,
+    notification,
     Card as AntCard,
     Divider,
     Typography
@@ -22,6 +22,7 @@ import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
 const { Title } = Typography;
+const { Option } = Select;
 
 interface Props {
     categories: Category[];
@@ -37,7 +38,7 @@ export default function CreateProduct({ categories }: Props) {
         name: '',
         description: '',
         price: '',
-        image: null as File | null,
+        images: [] as File[],
         measurements: {},
         stock: '',
         category_ids: [] as number[],
@@ -47,39 +48,91 @@ export default function CreateProduct({ categories }: Props) {
     });
 
     const [form] = Form.useForm();
-    const [messageApi, contextHolder] = message.useMessage();
+    const [notificationApi, contextHolder] = notification.useNotification();
 
     const handleSubmit = () => {
-        post(route('products.store'), {
+        // Mostrar notificación antes de enviar (para que se vea aunque haya redirección)
+        notificationApi.success({
+            message: 'Procesando',
+            description: 'Creando producto...',
+            placement: 'topRight',
+            duration: 2
+        });
+
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price', data.price);
+        formData.append('stock', data.stock);
+
+        // Añadir múltiples imágenes
+        data.images.forEach((image, index) => {
+            formData.append(`images[${index}]`, image);
+        });
+
+        // Añadir categorías
+        data.category_ids.forEach(id => {
+            formData.append('category_ids[]', id.toString());
+        });
+
+        // Añadir campos opcionales si existen
+        if (data.color) formData.append('color', data.color);
+        if (data.size) formData.append('size', data.size);
+        if (data.material) formData.append('material', data.material);
+
+        // Enviar formulario
+        post(route('admin.products.store'), {
+            data: formData,
             onSuccess: () => {
-                messageApi.success('Producto creado exitosamente');
+                // No es necesario mostrar notificación aquí, ya se mostrará con el flash message
             },
             onError: () => {
-                messageApi.error('Error al crear el producto');
-            }
+                notificationApi.error({
+                    message: 'Error al crear',
+                    description: 'Hubo un problema al crear el producto',
+                    placement: 'topRight',
+                    duration: 4
+                });
+            },
+            // Preservar el flash después de la redirección
+            preserveScroll: true
         });
     };
 
-    const handleCategoryChange = (categoryId: number, checked: boolean) => {
-        const updatedCategories = checked
-            ? [...data.category_ids, categoryId]
-            : data.category_ids.filter((id) => id !== categoryId);
-
-        setData('category_ids', updatedCategories);
+    const handleCategoryChange = (values: number[]) => {
+        setData('category_ids', values);
     };
 
-    const handleImageUpload: UploadProps['onChange'] = ({ file }) => {
-        if (file.originFileObj) {
-            setData('image', file.originFileObj);
-        }
+    const handleImagesUpload: UploadProps['onChange'] = ({ fileList }) => {
+        const files = fileList
+            .filter(file => !!file.originFileObj)
+            .map(file => file.originFileObj) as File[];
+
+        setData('images', files);
     };
 
     const uploadProps = {
         beforeUpload: (file: File) => {
-            setData('image', file);
+            const isImage = file.type.startsWith('image/');
+            if (!isImage) {
+                notificationApi.error({
+                    message: 'Error de archivo',
+                    description: 'Solo se permiten archivos de imagen',
+                    placement: 'topRight'
+                });
+                return Upload.LIST_IGNORE;
+            }
             return false;
         },
-        fileList: data.image ? [{ uid: '-1', name: data.image.name, status: 'done' } as UploadFile] : [],
+        fileList: data.images.map((file, index) => ({
+            uid: `-${index}`,
+            name: file.name,
+            status: 'done',
+            url: URL.createObjectURL(file)
+        })) as UploadFile[],
+        onChange: handleImagesUpload,
+        multiple: true,
+        listType: 'picture-card',
     };
 
     return (
@@ -102,6 +155,7 @@ export default function CreateProduct({ categories }: Props) {
                                     description: data.description,
                                     price: data.price ? parseFloat(data.price) : undefined,
                                     stock: data.stock ? parseInt(data.stock) : undefined,
+                                    category_ids: data.category_ids,
                                 }}
                             >
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,40 +207,42 @@ export default function CreateProduct({ categories }: Props) {
                                             onChange={(value) => setData('stock', value ? value.toString() : '')}
                                         />
                                     </Form.Item>
+                                </div>
 
                                     <Form.Item
-                                        label="Imagen"
-                                        name="image"
-                                        validateStatus={errors.image ? 'error' : ''}
-                                        help={errors.image}
+                                    label="Imágenes"
+                                    name="images"
+                                    validateStatus={errors.images ? 'error' : ''}
+                                    help={errors.images}
                                     >
-                                        <Upload
-                                            {...uploadProps}
-                                            onChange={handleImageUpload}
-                                            listType="picture"
-                                            maxCount={1}
-                                        >
-                                            <AntButton icon={<UploadOutlined />}>Seleccionar imagen</AntButton>
+                                    <Upload {...uploadProps}>
+                                        <div>
+                                            <UploadOutlined />
+                                            <div style={{ marginTop: 8 }}>Subir imágenes</div>
+                                        </div>
                                         </Upload>
                                     </Form.Item>
-                                </div>
 
                                 <Divider orientation="left">Categorías</Divider>
                                 <Form.Item
+                                    name="category_ids"
                                     validateStatus={errors.category_ids ? 'error' : ''}
                                     help={errors.category_ids}
                                 >
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                        {categories.map((category) => (
-                                            <Checkbox
-                                                key={category.id}
-                                                checked={data.category_ids.includes(category.id)}
-                                                onChange={(e) => handleCategoryChange(category.id, e.target.checked)}
-                                            >
+                                    <Select
+                                        mode="multiple"
+                                        placeholder="Seleccione categorías"
+                                        style={{ width: '100%' }}
+                                        value={data.category_ids}
+                                        onChange={handleCategoryChange}
+                                        optionFilterProp="children"
+                                    >
+                                        {categories.map(category => (
+                                            <Option key={category.id} value={category.id}>
                                                 {category.name}
-                                            </Checkbox>
+                                            </Option>
                                         ))}
-                                    </div>
+                                    </Select>
                                 </Form.Item>
 
                                 <Form.Item

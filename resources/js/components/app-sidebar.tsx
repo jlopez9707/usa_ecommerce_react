@@ -21,13 +21,13 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Categorias',
         href: '/admin/categories',
-        icon: ShoppingBag
+        icon: ShoppingBag,
     },
     {
         title: 'Configuraciones de la tienda',
         href: '/admin/store-settings',
-        icon: ShoppingBag
-    }
+        icon: ShoppingBag,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

@@ -8,13 +8,7 @@ import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined 
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { router } from '@inertiajs/react';
-
-interface Category {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
+import { Category } from '@/types/categories';
 
 interface FilterState {
     search: string;
@@ -64,11 +58,11 @@ const defaultFilters: FilterState = {
 export default function CategoryList({ categories, filters }: Props) {
     // Estado único para todos los filtros
     const [filterState, setFilterState] = useState<FilterState>({
-        search: filters.search || '',
-        sort_field: filters.sort_field || 'created_at',
-        sort_direction: filters.sort_direction || 'desc',
-        page: filters.page || 1,
-        per_page: filters.per_page || 10
+        search: filters.search ?? '',
+        sort_field: filters.sort_field ?? 'created_at',
+        sort_direction: filters.sort_direction ?? 'desc',
+        page: filters.page ?? 1,
+        per_page: filters.per_page ?? 10
     });
     const [loading, setLoading] = useState(false);
 
@@ -101,7 +95,7 @@ export default function CategoryList({ categories, filters }: Props) {
         );
 
         // Usamos router.get de Inertia para navegar a la URL con los filtros
-        router.get(route('categories.index'), filteredParams as Record<string, string>, {
+        router.get(route('admin.categories.index'), filteredParams as Record<string, string>, {
             preserveState: true,
             replace: true,
             onSuccess: () => setLoading(false),
@@ -127,7 +121,7 @@ export default function CategoryList({ categories, filters }: Props) {
         setFilterState(defaultFilters);
 
         // Limpiar todos los filtros en la URL
-        router.get(route('categories.index'), {}, {
+        router.get(route('admin.categories.index'), {}, {
             preserveState: false,
             replace: true
         });
@@ -195,14 +189,14 @@ export default function CategoryList({ categories, filters }: Props) {
             width: 120,
             render: (_, record) => (
                 <Space size="small">
-                    <Link href={route('categories.show', record.id)}>
+                    <Link href={route('admin.categories.show', record.id)}>
                         <AntButton
                             type="text"
                             icon={<EyeOutlined />}
                             title="Ver"
                         />
                     </Link>
-                    <Link href={route('categories.edit', record.id)}>
+                    <Link href={route('admin.categories.edit', record.id)}>
                         <AntButton
                             type="text"
                             icon={<EditOutlined />}
@@ -284,7 +278,7 @@ export default function CategoryList({ categories, filters }: Props) {
                                         Limpiar
                                     </AntButton>
                                 </form>
-                                <Link href={route('categories.create')}>
+                                <Link href={route('admin.categories.create')}>
                                     <AntButton type="primary" icon={<PlusOutlined />}>
                                         Crear Categoría
                                     </AntButton>
