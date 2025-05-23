@@ -1,8 +1,9 @@
 import { Head, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BreadcrumbItem } from '@/types';
-import { Product } from '@/types/product';
+import { Category } from '@/types/categories';
 import {
     Form,
     Input,
@@ -12,75 +13,83 @@ import {
     Select,
     Space,
     notification,
+    Card as AntCard,
     Divider,
+    Typography
 } from 'antd';
-import { UploadOutlined, SaveOutlined, ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { UploadFile, UploadProps, UploadListType } from 'antd/es/upload/interface';
-import React from 'react';
-import { Category } from '@/types/categories';
+import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
+const { Title } = Typography;
 const { Option } = Select;
 
 interface Props {
-    product: Product & { categories: Category[] };
     categories: Category[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Productos', href: '/products' },
-    { title: 'Editar Producto', href: '/products/edit' },
+    { title: 'Productos', href: '/admin/products' },
+    { title: 'Crear Producto', href: '/admin/products/create' },
 ];
 
-export default function EditProduct({ product, categories }: Props) {
+export default function CreateProduct({ categories }: Props) {
     const { data, setData, post, processing, errors } = useForm({
-        name: product.name,
-        description: product.description,
-        price: product.price.toString(),
-        newImages: [] as File[],
-        stock: product.stock.toString(),
-        category_ids: product.categories ? product.categories.map(cat => cat.id) : [],
-        deleteImageIds: [] as number[],
-        _method: 'PUT',
+        name: '',
+        description: '',
+        price: '',
+        images: [] as File[],
+        measurements: {},
+        stock: '',
+        category_ids: [] as number[],
+        color: '',
+        size: '',
+        material: '',
     });
 
     const [form] = Form.useForm();
-
-    // Establecer valores iniciales del formulario cuando se carga el componente
-    React.useEffect(() => {
-        form.setFieldsValue({
-            name: data.name,
-            description: data.description,
-            price: data.price ? parseFloat(data.price) : undefined,
-            stock: data.stock ? parseInt(data.stock) : undefined,
-            category_ids: data.category_ids,
-        });
-    }, []);
-
     const [notificationApi, contextHolder] = notification.useNotification();
 
     const handleSubmit = () => {
         // Mostrar notificación antes de enviar (para que se vea aunque haya redirección)
         notificationApi.success({
             message: 'Procesando',
-            description: 'Actualizando producto...',
+            description: 'Creando producto...',
             placement: 'topRight',
             duration: 2
         });
 
-        // En lugar de usar put directamente, usamos post con método spoofing
-        post(route('products.update', product.id), {
-            forceFormData: true,
-            onSuccess: () => {
-                // Limpiar imágenes después de guardar
-                setData('newImages', []);
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('price', data.price);
+        formData.append('stock', data.stock);
 
+        // Añadir múltiples imágenes
+        data.images.forEach((image, index) => {
+            formData.append(`images[${index}]`, image);
+        });
+
+        // Añadir categorías
+        data.category_ids.forEach(id => {
+            formData.append('category_ids[]', id.toString());
+        });
+
+        // Añadir campos opcionales si existen
+        if (data.color) formData.append('color', data.color);
+        if (data.size) formData.append('size', data.size);
+        if (data.material) formData.append('material', data.material);
+
+        // Enviar formulario
+        post(route('admin.products.store'), {
+            data: formData,
+            onSuccess: () => {
                 // No es necesario mostrar notificación aquí, ya se mostrará con el flash message
             },
             onError: () => {
                 notificationApi.error({
-                    message: 'Error al actualizar',
-                    description: 'Hubo un problema al actualizar el producto',
+                    message: 'Error al crear',
+                    description: 'Hubo un problema al crear el producto',
                     placement: 'topRight',
                     duration: 4
                 });
@@ -91,40 +100,15 @@ export default function EditProduct({ product, categories }: Props) {
     };
 
     const handleCategoryChange = (values: number[]) => {
-        console.log('Categorías seleccionadas:', values);
         setData('category_ids', values);
     };
 
-    const handleNewImagesUpload: UploadProps['onChange'] = ({ fileList }) => {
+    const handleImagesUpload: UploadProps['onChange'] = ({ fileList }) => {
         const files = fileList
             .filter(file => !!file.originFileObj)
             .map(file => file.originFileObj) as File[];
 
-        console.log('Nuevas imágenes para subir:', files.length);
-        console.log('Nombres de archivos:', files.map(f => f.name));
-
-        setData('newImages', files);
-
-        // Mensaje para confirmar al usuario
-        if (files.length > 0) {
-            notificationApi.success({
-                message: 'Imágenes seleccionadas',
-                description: `${files.length} imagen(es) lista(s) para subir`,
-                placement: 'topRight'
-            });
-        }
-    };
-
-    const handleDeleteImage = (imageId: number) => {
-        // Eliminación directa sin confirmación
-        const updatedDeleteIds = [...data.deleteImageIds, imageId];
-        setData('deleteImageIds', updatedDeleteIds);
-        notificationApi.success({
-            message: 'Imagen marcada',
-            description: 'Imagen marcada para eliminación',
-            placement: 'topRight'
-        });
-        console.log('Imágenes a eliminar:', updatedDeleteIds);
+        setData('images', files);
     };
 
     const uploadProps = {
@@ -138,30 +122,28 @@ export default function EditProduct({ product, categories }: Props) {
                 });
                 return Upload.LIST_IGNORE;
             }
-            return false; // Evitar subida automática
+            return false;
         },
-        fileList: data.newImages.map((file, index) => ({
+        fileList: data.images.map((file, index) => ({
             uid: `-${index}`,
             name: file.name,
             status: 'done',
             url: URL.createObjectURL(file)
         })) as UploadFile[],
-        onChange: handleNewImagesUpload,
+        onChange: handleImagesUpload,
         multiple: true,
-        listType: 'picture-card' as UploadListType,
-        accept: 'image/*',
+        listType: 'picture-card',
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Editar Producto" />
+            <Head title="Crear Producto" />
             {contextHolder}
-
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Editar Producto</CardTitle>
+                            <CardTitle>Crear Nuevo Producto</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Form
@@ -227,62 +209,25 @@ export default function EditProduct({ product, categories }: Props) {
                                     </Form.Item>
                                 </div>
 
-                                {/* Imágenes existentes */}
-                                {product.images && product.images.length > 0 && (
-                                    <div className="mb-6">
-                                        <Divider orientation="left">Imágenes Actuales</Divider>
-                                        <div className="flex flex-wrap gap-4">
-                                            {product.images.map(image => {
-                                                // Verificar si la imagen está marcada para eliminar
-                                                const isMarkedForDeletion = data.deleteImageIds.includes(image.id);
-
-                                                // Solo mostrar imágenes que no están marcadas para eliminar
-                                                if (!isMarkedForDeletion) {
-                                                    return (
-                                                        <div key={image.id} className="relative">
-                                                            <img
-                                                                src={`/storage/${image.url}`}
-                                                                alt={product.name}
-                                                                className="w-32 h-32 object-cover rounded"
-                                                            />
-                                                            <AntButton
-                                                                type="primary"
-                                                                danger
-                                                                icon={<DeleteOutlined />}
-                                                                size="small"
-                                                                className="absolute -top-2 -right-2"
-                                                                onClick={() => handleDeleteImage(image.id)}
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                                return null;
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Subir nuevas imágenes */}
-                                <Form.Item
-                                    label="Nuevas Imágenes"
-                                    name="newImages"
-                                    validateStatus={errors.newImages ? 'error' : ''}
-                                    help={errors.newImages}
-                                >
+                                    <Form.Item
+                                    label="Imágenes"
+                                    name="images"
+                                    validateStatus={errors.images ? 'error' : ''}
+                                    help={errors.images}
+                                    >
                                     <Upload {...uploadProps}>
                                         <div>
                                             <UploadOutlined />
                                             <div style={{ marginTop: 8 }}>Subir imágenes</div>
                                         </div>
-                                    </Upload>
-                                </Form.Item>
+                                        </Upload>
+                                    </Form.Item>
 
                                 <Divider orientation="left">Categorías</Divider>
                                 <Form.Item
                                     name="category_ids"
                                     validateStatus={errors.category_ids ? 'error' : ''}
                                     help={errors.category_ids}
-                                    rules={[{ required: true, message: 'Debe seleccionar al menos una categoría' }]}
                                 >
                                     <Select
                                         mode="multiple"
@@ -329,7 +274,7 @@ export default function EditProduct({ product, categories }: Props) {
                                             loading={processing}
                                             icon={<SaveOutlined />}
                                         >
-                                            {processing ? 'Guardando...' : 'Actualizar Producto'}
+                                            {processing ? 'Guardando...' : 'Guardar Producto'}
                                         </AntButton>
                                     </Space>
                                 </Form.Item>

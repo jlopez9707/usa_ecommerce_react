@@ -1,35 +1,40 @@
 import { Head, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BreadcrumbItem } from '@/types';
+import { Category } from '@/types/categories';
+
+interface Props {
+    category: Category;
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Categorías', href: '/categories' },
-    { title: 'Crear Categoría', href: '/categories/create' },
+    { title: 'Categorías', href: '/admin/categories' },
+    { title: 'Editar Categoría', href: '/admin/categories/edit' },
 ];
 
-export default function CreateCategory() {
-    const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        description: '',
+export default function EditCategory({ category }: Props) {
+    const { data, setData, put, processing, errors } = useForm({
+        name: category.name,
+        description: category.description || '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('categories.store'));
+        put(route('admin.categories.update', category.id));
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Crear Categoría" />
+            <Head title="Editar Categoría" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Crear Nueva Categoría</CardTitle>
+                            <CardTitle>Editar Categoría</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-6">
@@ -55,7 +60,7 @@ export default function CreateCategory() {
                                         Cancelar
                                     </Button>
                                     <Button type="submit" disabled={processing}>
-                                        {processing ? 'Guardando...' : 'Guardar Categoría'}
+                                        {processing ? 'Guardando...' : 'Guardar Cambios'}
                                     </Button>
                                 </div>
                             </form>

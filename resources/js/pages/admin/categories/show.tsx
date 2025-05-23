@@ -11,8 +11,8 @@ interface Props {
 
 export default function ShowCategory({ category }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Categorías', href: '/categories' },
-        { title: category.name, href: `/categories/${category.id}` },
+        { title: 'Categorías', href: '/admin/categories' },
+        { title: category.name, href: `/admin/categories/${category.id}` },
     ];
 
     return (
@@ -28,7 +28,7 @@ export default function ShowCategory({ category }: Props) {
                                     variant="outline"
                                     asChild
                                 >
-                                    <Link href={route('categories.edit', category.id)}>
+                                    <Link href={route('admin.categories.edit', category.id)}>
                                         Editar
                                     </Link>
                                 </Button>
@@ -36,7 +36,7 @@ export default function ShowCategory({ category }: Props) {
                                     variant="outline"
                                     asChild
                                 >
-                                    <Link href={route('categories.index')}>
+                                    <Link href={route('admin.categories.index')}>
                                         Volver
                                     </Link>
                                 </Button>

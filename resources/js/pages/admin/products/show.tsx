@@ -22,8 +22,8 @@ interface Props {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Productos', href: '/products' },
-    { title: 'Detalles del Producto', href: '/products/show' },
+    { title: 'Productos', href: '/admin/products' },
+    { title: 'Detalles del Producto', href: '/admin/products/show' },
 ];
 
 export default function ShowProduct({ product }: Props) {
@@ -45,7 +45,7 @@ export default function ShowProduct({ product }: Props) {
                                 <AntButton
                                     type="primary"
                                     icon={<EditOutlined />}
-                                    onClick={() => window.location.href = route('products.edit', product.id)}
+                                    onClick={() => window.location.href = route('admin.products.edit', product.id)}
                                 >
                                     Editar
                                 </AntButton>
