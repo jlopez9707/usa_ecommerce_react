@@ -21,12 +21,12 @@ interface Props {
     product: Product & { categories: Category[] };
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Productos', href: '/admin/products' },
-    { title: 'Detalles del Producto', href: '/admin/products/show' },
-];
 
 export default function ShowProduct({ product }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Productos', href: '/admin/products' },
+        { title: product.name, href: `/admin/products/${product.id}` },
+    ];
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Producto: ${product.name}`} />
@@ -42,13 +42,14 @@ export default function ShowProduct({ product }: Props) {
                                 >
                                     Volver
                                 </AntButton>
-                                <AntButton
-                                    type="primary"
-                                    icon={<EditOutlined />}
-                                    onClick={() => window.location.href = route('admin.products.edit', product.id)}
-                                >
-                                    Editar
-                                </AntButton>
+                                <Link href={route('admin.products.edit', product.id)}>
+                                    <AntButton
+                                        type="primary"
+                                        icon={<EditOutlined />}
+                                    >
+                                        Editar
+                                    </AntButton>
+                                </Link>
                             </div>
                         </CardHeader>
                         <CardContent>

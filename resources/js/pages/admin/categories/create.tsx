@@ -1,10 +1,18 @@
 import { Head, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Form,
+    Input,
+    Button as AntButton,
+    Space,
+    notification,
+} from 'antd';
+import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import React from 'react';
+
+const { TextArea } = Input;
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Categorías', href: '/admin/categories' },
@@ -14,17 +22,42 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function CreateCategory() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
-        description: '',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('admin.categories.store'));
+    const [form] = Form.useForm();
+
+    const [notificationApi, contextHolder] = notification.useNotification();
+
+    const handleSubmit = () => {
+        // Mostrar notificación antes de enviar (para que se vea aunque haya redirección)
+        notificationApi.success({
+            message: 'Procesando',
+            description: 'Creando categoría...',
+            placement: 'topRight',
+            duration: 2
+        });
+
+        post(route('admin.categories.store'), {
+            onSuccess: () => {
+                // No es necesario mostrar notificación aquí, ya se mostrará con el flash message
+            },
+            onError: () => {
+                notificationApi.error({
+                    message: 'Error al crear',
+                    description: 'Hubo un problema al crear la categoría',
+                    placement: 'topRight',
+                    duration: 4
+                });
+            },
+            // Preservar el flash después de la redirección
+            preserveScroll: true
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Crear Categoría" />
+            {contextHolder}
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>
@@ -32,33 +65,48 @@ export default function CreateCategory() {
                             <CardTitle>Crear Nueva Categoría</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Nombre</Label>
+                            <Form
+                                form={form}
+                                layout="vertical"
+                                onFinish={handleSubmit}
+                                initialValues={{
+                                    name: data.name,
+                                    description: data.description,
+                                }}
+                            >
+                                <Form.Item
+                                    label="Nombre"
+                                    name="name"
+                                    rules={[{ required: true, message: 'Por favor ingrese el nombre de la categoría' }]}
+                                    validateStatus={errors.name ? 'error' : ''}
+                                    help={errors.name}
+                                >
                                     <Input
-                                        id="name"
+                                        placeholder="Nombre de la categoría"
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
-                                        required
                                     />
-                                    {errors.name && (
-                                        <p className="text-sm text-red-500">{errors.name}</p>
-                                    )}
-                                </div>
+                                </Form.Item>
 
-                                <div className="flex justify-end space-x-4">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => window.history.back()}
-                                    >
-                                        Cancelar
-                                    </Button>
-                                    <Button type="submit" disabled={processing}>
-                                        {processing ? 'Guardando...' : 'Guardar Categoría'}
-                                    </Button>
-                                </div>
-                            </form>
+                                <Form.Item className="flex justify-end">
+                                    <Space>
+                                        <AntButton
+                                            onClick={() => window.history.back()}
+                                            icon={<ArrowLeftOutlined />}
+                                        >
+                                            Cancelar
+                                        </AntButton>
+                                        <AntButton
+                                            type="primary"
+                                            htmlType="submit"
+                                            loading={processing}
+                                            icon={<SaveOutlined />}
+                                        >
+                                            {processing ? 'Guardando...' : 'Crear Categoría'}
+                                        </AntButton>
+                                    </Space>
+                                </Form.Item>
+                            </Form>
                         </CardContent>
                     </Card>
                 </div>
