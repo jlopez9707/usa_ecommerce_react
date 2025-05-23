@@ -15,12 +15,17 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Productos',
-        href: '/products',
+        href: '/admin/products',
         icon: ShoppingBag,
     },
     {
         title: 'Categorias',
-        href: '/categories',
+        href: '/admin/categories',
+        icon: ShoppingBag
+    },
+    {
+        title: 'Configuraciones de la tienda',
+        href: '/admin/store-settings',
         icon: ShoppingBag
     }
 ];
