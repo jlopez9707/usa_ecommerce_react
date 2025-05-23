@@ -1,9 +1,21 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Category } from '@/types';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type Product } from '@/types/product';
+import {
+    Button as AntButton,
+    Descriptions,
+    Tag,
+    Typography,
+    Image,
+    Divider,
+    Space,
+    Carousel
+} from 'antd';
+import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 
 interface Props {
     product: Product & { categories: Category[] };
@@ -24,114 +36,109 @@ export default function ShowProduct({ product }: Props) {
                         <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle>Detalles del Producto</CardTitle>
                             <div className="flex space-x-4">
-                                <Button
-                                    variant="outline"
+                                <AntButton
+                                    icon={<ArrowLeftOutlined />}
                                     onClick={() => window.history.back()}
                                 >
                                     Volver
-                                </Button>
-                                <Button
-                                    onClick={() => window.location.href = route('products.edit', product.id)}
+                                </AntButton>
+                                <AntButton
+                                    type="primary"
+                                    icon={<EditOutlined />}
+                                    onClick={() => window.location.href = route('admin.products.edit', product.id)}
                                 >
                                     Editar
-                                </Button>
+                                </AntButton>
                             </div>
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    {product.image && (
-                                        <img
-                                            src={`/storage/${product.image}`}
-                                            alt={product.name}
-                                            className="w-full h-96 object-cover rounded-lg"
-                                        />
+                                    {product.images && product.images.length > 0 ? (
+                                        <Carousel autoplay className="mb-4">
+                                            {product.images.map((image) => (
+                                                <div key={image.id}>
+                                                    <Image
+                                                        src={`/storage/${image.url}`}
+                                                        alt={product.name}
+                                                        className="rounded-lg"
+                                                        style={{ maxHeight: '400px', objectFit: 'cover', margin: '0 auto' }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </Carousel>
+                                    ) : (
+                                        <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg">
+                                            <Text type="secondary">Sin imágenes</Text>
+                                        </div>
                                     )}
                                 </div>
                                 <div className="space-y-6">
                                     <div>
-                                        <h2 className="text-2xl font-bold">{product.name}</h2>
-                                        <p className="text-3xl font-bold text-primary mt-2">
+                                        <Title level={2}>{product.name}</Title>
+                                        <Title level={3} type="success" style={{ marginTop: 8 }}>
                                             ${product.price}
-                                        </p>
+                                        </Title>
                                     </div>
 
-                                    <div className="space-y-4">
-                                        <div>
-                                            <h3 className="text-lg font-semibold">Descripción</h3>
-                                            <p className="text-gray-600 dark:text-gray-400">
-                                                {product.description}
-                                            </p>
-                                        </div>
+                                    <Divider />
 
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <h3 className="text-lg font-semibold">Stock</h3>
-                                                <p className="text-gray-600 dark:text-gray-400">
-                                                    {product.stock} unidades
-                                                </p>
-                                            </div>
+                                    <Descriptions title="Información del Producto" column={1} bordered>
+                                        <Descriptions.Item label="Descripción">
+                                            {product.description}
+                                        </Descriptions.Item>
 
-                                            {product.categories && product.categories.length > 0 && (
-                                                <div>
-                                                    <h3 className="text-lg font-semibold">Categorías</h3>
-                                                    <div className="flex flex-wrap gap-1 mt-1">
-                                                        {product.categories.map(category => (
-                                                            <span
-                                                                key={category.id}
-                                                                className="px-2 py-1 bg-primary/10 text-primary text-sm rounded-full"
-                                                            >
-                                                                {category.name}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                        <Descriptions.Item label="Stock">
+                                            <Tag
+                                                color={product.stock > 20 ? "green" : product.stock > 5 ? "orange" : "red"}
+                                            >
+                                                {product.stock} unidades
+                                            </Tag>
+                                        </Descriptions.Item>
 
-                                            {product.color && (
-                                                <div>
-                                                    <h3 className="text-lg font-semibold">Color</h3>
-                                                    <p className="text-gray-600 dark:text-gray-400">
-                                                        {product.color}
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {product.size && (
-                                                <div>
-                                                    <h3 className="text-lg font-semibold">Talla</h3>
-                                                    <p className="text-gray-600 dark:text-gray-400">
-                                                        {product.size}
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {product.material && (
-                                                <div>
-                                                    <h3 className="text-lg font-semibold">Material</h3>
-                                                    <p className="text-gray-600 dark:text-gray-400">
-                                                        {product.material}
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {product.measurements && Object.keys(product.measurements).length > 0 && (
-                                            <div>
-                                                <h3 className="text-lg font-semibold">Medidas</h3>
-                                                <div className="grid grid-cols-2 gap-4 mt-2">
-                                                    {Object.entries(product.measurements).map(([key, value]) => (
-                                                        <div key={key}>
-                                                            <span className="font-medium">{key}:</span>{' '}
-                                                            <span className="text-gray-600 dark:text-gray-400">
-                                                                {value}
-                                                            </span>
-                                                        </div>
+                                        {product.categories && product.categories.length > 0 && (
+                                            <Descriptions.Item label="Categorías">
+                                                <Space wrap>
+                                                    {product.categories.map(category => (
+                                                        <Tag key={category.id} color="blue">
+                                                            {category.name}
+                                                        </Tag>
                                                     ))}
-                                                </div>
-                                            </div>
+                                                </Space>
+                                            </Descriptions.Item>
                                         )}
-                                    </div>
+
+                                        {product.color && (
+                                            <Descriptions.Item label="Color">
+                                                {product.color}
+                                            </Descriptions.Item>
+                                        )}
+
+                                        {product.size && (
+                                            <Descriptions.Item label="Talla">
+                                                {product.size}
+                                            </Descriptions.Item>
+                                        )}
+
+                                        {product.material && (
+                                            <Descriptions.Item label="Material">
+                                                {product.material}
+                                            </Descriptions.Item>
+                                        )}
+                                    </Descriptions>
+
+                                    {product.measurements && Object.keys(product.measurements).length > 0 && (
+                                        <div>
+                                            <Divider orientation="left">Medidas</Divider>
+                                            <Descriptions bordered column={2}>
+                                                {Object.entries(product.measurements).map(([key, value]) => (
+                                                    <Descriptions.Item key={key} label={key}>
+                                                        {value}
+                                                    </Descriptions.Item>
+                                                ))}
+                                            </Descriptions>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </CardContent>

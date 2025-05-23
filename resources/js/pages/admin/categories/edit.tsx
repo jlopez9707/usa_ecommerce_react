@@ -19,7 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function EditCategory({ category }: Props) {
     const { data, setData, put, processing, errors } = useForm({
         name: category.name,
-        description: category.description || '',
+        description: category.description ?? '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {

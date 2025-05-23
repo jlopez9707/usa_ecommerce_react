@@ -24,8 +24,8 @@ const mainNavItems: NavItem[] = [
         icon: ShoppingBag,
     },
     {
-        title: 'Configuraciones de la tienda',
-        href: '/admin/store-settings',
+        title: 'Configuraciones',
+        href: '/admin/storeSettings',
         icon: ShoppingBag,
     },
 ];

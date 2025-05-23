@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, PageProps } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,6 @@ import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined 
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { Product } from '@/types/product';
-import { router } from '@inertiajs/react';
 
 interface FilterState {
     search: string;
@@ -52,7 +51,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Productos', href: '/admin/products' },
 ];
 
-// Valores por defecto para los filtros
 const defaultFilters: FilterState = {
     search: '',
     category: '',
@@ -68,20 +66,18 @@ export default function ProductList({ products, filters }: Props) {
     const { flash = {} } = usePage<PageProps>().props;
     const [notificationApi, contextHolder] = notification.useNotification();
     const [filterState, setFilterState] = useState<FilterState>({
-        search: filters.search || '',
-        category: filters.category || '',
-        min_price: filters.min_price || '',
-        max_price: filters.max_price || '',
-        sort_field: filters.sort_field || 'created_at',
-        sort_direction: filters.sort_direction || 'desc',
-        page: filters.page || 1,
-        per_page: filters.per_page || 10
+        search: filters.search ?? '',
+        category: filters.category ?? '',
+        min_price: filters.min_price ?? '',
+        max_price: filters.max_price ?? '',
+        sort_field: filters.sort_field ?? 'created_at',
+        sort_direction: filters.sort_direction ?? 'desc',
+        page: filters.page ?? 1,
+        per_page: filters.per_page ?? 10
     });
     const [loading, setLoading] = useState(false);
 
-    // Mostrar notificaciones flash cuando se carga el componente
     useEffect(() => {
-        // Solo mostrar la notificación si existe y tiene contenido
         if (flash?.success && typeof flash.success === 'string' && flash.success.trim() !== '') {
             notificationApi.success({
                 message: 'Éxito',
@@ -101,7 +97,6 @@ export default function ProductList({ products, filters }: Props) {
         }
     }, [flash]);
 
-    // Función para actualizar un campo específico del estado
     const updateFilter = (field: keyof FilterState, value: string | number) => {
         setFilterState(prev => ({
             ...prev,
@@ -109,27 +104,22 @@ export default function ProductList({ products, filters }: Props) {
         }));
     };
 
-    // Función para aplicar los filtros
     const applyFilters = (newFilters: Partial<FilterState> = {}) => {
         setLoading(true);
 
-        // Combinar el estado actual con los nuevos filtros
         const updatedFilters = {
             ...filterState,
             ...newFilters
         };
 
-        // Actualizar el estado con los nuevos valores
         setFilterState(updatedFilters);
 
-        // Filtramos los parámetros vacíos para no enviarlos
         const filteredParams = Object.fromEntries(
             Object.entries(updatedFilters).filter(([, value]) =>
                 value !== undefined && value !== null && value !== ''
             )
         );
 
-        // Usamos router.get de Inertia para navegar a la URL con los filtros
         router.get(route('admin.products.index'), filteredParams as Record<string, string>, {
             preserveState: true,
             replace: true,
@@ -152,10 +142,8 @@ export default function ProductList({ products, filters }: Props) {
     }
 
     function clearFilters() {
-        // Resetear todos los filtros a los valores por defecto
         setFilterState(defaultFilters);
 
-        // Limpiar todos los filtros en la URL
         router.get(route('admin.products.index'), {}, {
             preserveState: false,
             replace: true
@@ -170,12 +158,10 @@ export default function ProductList({ products, filters }: Props) {
         let newSortField: string;
         let newSortDirection: 'asc' | 'desc';
 
-        // Si order es undefined (tercer click), volvemos al orden predeterminado
         if (order === undefined) {
             newSortField = 'created_at';
             newSortDirection = 'desc';
         } else {
-            // Normal: ascendente o descendente
             newSortField = field as string;
             newSortDirection = order === 'ascend' ? 'asc' : 'desc';
         }
@@ -186,7 +172,6 @@ export default function ProductList({ products, filters }: Props) {
         });
     }
 
-    // Configuración de las columnas para la tabla de Ant Design
     const columns: ColumnsType<Product> = [
         {
             title: 'ID',
@@ -269,33 +254,26 @@ export default function ProductList({ products, filters }: Props) {
         },
     ];
 
-    // Manejador para cambios en la tabla (ordenamiento y paginación)
     const handleTableChange = (
         pagination: TablePaginationConfig,
         _: Record<string, FilterValue | null>,
         sorter: SorterResult<Product> | SorterResult<Product>[]
     ) => {
-        // Manejar cambios de página
         if (pagination.current) {
             handlePageChange(pagination.current);
         }
 
-        // Manejar cambios de elementos por página
         if (pagination.pageSize && pagination.pageSize !== filterState.per_page) {
             handlePerPageChange(pagination.pageSize);
         }
 
-        // Manejar cambios de ordenamiento
         if (sorter) {
-            // Extraer la información de orden (puede ser un array o un objeto único)
             const sorterObj = Array.isArray(sorter) ? sorter[0] : sorter;
 
-            // Pasar al manejador de ordenamiento siempre, incluso si no hay orden (para resetear)
             handleSort(sorterObj);
         }
     };
 
-    // Verificar si hay filtros activos
     const hasActiveFilters = () => {
         return !!(
             filterState.search ||

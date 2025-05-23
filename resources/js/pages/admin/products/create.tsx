@@ -1,7 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Category } from '@/types/categories';
 import {
@@ -13,15 +12,12 @@ import {
     Select,
     Space,
     notification,
-    Card as AntCard,
     Divider,
-    Typography
 } from 'antd';
 import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
-const { Title } = Typography;
 const { Option } = Select;
 
 interface Props {
