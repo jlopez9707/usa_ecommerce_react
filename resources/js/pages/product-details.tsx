@@ -25,10 +25,10 @@ import '@/assets/js/plugins/venobox.min.js';
 
 import '@/assets/js/main.js';
 
-export default function StorePage() {
+export default function ProductDetailsPage() {
     return (
         <>
-            <Head title="Store">
+            <Head title="Product details">
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" />
                 <link
@@ -622,21 +622,21 @@ export default function StorePage() {
                     <div className="box-wrapper">
                         <div className="breadcrumb-wrapper breadcrumb-wrapper--style-1 pos-relative">
                             <div className="breadcrumb-bg">
-                                <img src="assets/images/breadcrumb/breadcrumb-img-shop-page.webp" alt="" />
+                                <img src="assets/images/breadcrumb/breadcrumb-img-product-details-page.webp" alt="" />
                             </div>
                             <div className="breadcrumb-content section-fluid-270">
                                 <div className="breadcrumb-wrapper">
                                     <div className="content">
                                         <span className="title-tag">BEST DEAL FOREVER</span>
                                         <h2 className="title">
-                                            <span className="text-mark">Hurry!</span> <br /> Get your product now
+                                            <span className="text-mark">Product</span> Details
                                         </h2>
                                     </div>
                                     <ul className="breadcrumb-nav">
                                         <li>
                                             <a href="shop-grid-sidebar-left.html">Shop</a>
                                         </li>
-                                        <li> Shop Page Left Sidebar</li>
+                                        <li>Product Details Default</li>
                                     </ul>
                                 </div>
                             </div>
@@ -644,336 +644,281 @@ export default function StorePage() {
                     </div>
                 </div>
 
-                <div className="shop-list-section section-fluid-270 section-top-gap-100">
+                <div className="product-gallery-info-section section-fluid-270 section-top-gap-100">
                     <div className="box-wrapper">
-                        <div className="shop-list-wrapper">
+                        <div className="product-gallery-info-wrapper">
                             <div className="container-fluid">
-                                <div className="row flex-column-reverse flex-lg-row">
-                                    <div className="col-xl-3 col-lg-3">
-                                        <div className="siderbar-section">
-                                            <div className="sidebar-single-widget">
-                                                <h6 className="sidebar-title title-border title-border">Categories</h6>
-                                                <div className="sidebar-content">
-                                                    <div className="filter-type-select">
-                                                        <ul>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="men">
-                                                                    <input type="checkbox" id="men" />
-                                                                    <span>Men</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="women">
-                                                                    <input type="checkbox" id="women" />
-                                                                    <span>Women</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="kid">
-                                                                    <input type="checkbox" id="kid" />
-                                                                    <span>Kid</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="fashion">
-                                                                    <input type="checkbox" id="fashion" />
-                                                                    <span>Fashion</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="new-arrival">
-                                                                    <input type="checkbox" id="new-arrival" />
-                                                                    <span>New Arrival</span>
-                                                                </label>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="sidebar-single-widget">
-                                                <h6 className="sidebar-title title-border">Color</h6>
-                                                <div className="sidebar-content">
-                                                    <div className="filter-type-select">
-                                                        <ul>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="red">
-                                                                    <input type="checkbox" id="red" />
-                                                                    <span>Red</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="green">
-                                                                    <input type="checkbox" id="green" />
-                                                                    <span>Green</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="blue">
-                                                                    <input type="checkbox" id="blue" />
-                                                                    <span>Blue</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="black">
-                                                                    <input type="checkbox" id="black" />
-                                                                    <span>Black</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="pink">
-                                                                    <input type="checkbox" id="pink" />
-                                                                    <span>Pink</span>
-                                                                </label>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="sidebar-single-widget">
-                                                <h6 className="sidebar-title title-border">FILTER BY PRICE</h6>
-                                                <div className="sidebar-content">
-                                                    <input
-                                                        type="text"
-                                                        className="js-range-slider"
-                                                        name="my_range"
-                                                        value=""
-                                                        data-type="double"
-                                                        data-min="0"
-                                                        data-max="7000"
-                                                        data-from="500"
-                                                        data-to="5000"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="sidebar-single-widget">
-                                                <h6 className="sidebar-title title-border">Material</h6>
-                                                <div className="sidebar-content">
-                                                    <div className="filter-type-select">
-                                                        <ul>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="fabric">
-                                                                    <input type="checkbox" id="fabric" />
-                                                                    <span>Fabric</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="wood">
-                                                                    <input type="checkbox" id="wood" />
-                                                                    <span>Wood</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label className="checkbox-default" htmlFor="cotton">
-                                                                    <input type="checkbox" id="cotton" />
-                                                                    <span>Cotton</span>
-                                                                </label>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="sidebar-single-widget">
-                                                <div className="sidebar-content">
-                                                    <div className="banner-animate--flash">
-                                                        <a href="product-details-default.html" className="sidebar-banner img-responsive">
-                                                            <img src="assets/images/banner/banner-sidebar.webp" alt="" />
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="sidebar-single-widget">
-                                                <h6 className="sidebar-title title-border">Tags</h6>
-                                                <div className="sidebar-content">
-                                                    <ul className="tag-link">
-                                                        <li>
-                                                            <a href="">Fabric</a>
+                                <div className="row">
+                                    <div className="col-xxl-8 col-lg-6">
+                                        <div className="product-gallery product-gallery--style-tab">
+                                            <div className="row flex-md-row flex-column-reverse">
+                                                <div className="col-md-3">
+                                                    <ul className="product-thumbnail-image nav">
+                                                        <li className="nav-item">
+                                                            <button
+                                                                className="nav-link active"
+                                                                data-bs-toggle="tab"
+                                                                data-bs-target="#img-1"
+                                                                type="button"
+                                                            >
+                                                                <span className="thumb">
+                                                                    <img
+                                                                        className="img-fluid"
+                                                                        src="assets/images/products/product-details/product-thumb-1.webp"
+                                                                        alt=""
+                                                                    />
+                                                                </span>
+                                                            </button>
                                                         </li>
-                                                        <li>
-                                                            <a href="">Cloth</a>
+                                                        <li className="nav-item" role="presentation">
+                                                            <button className="nav-link" data-bs-toggle="tab" data-bs-target="#img-2" type="button">
+                                                                <span className="thumb">
+                                                                    <img
+                                                                        className="img-fluid"
+                                                                        src="assets/images/products/product-details/product-thumb-2.webp"
+                                                                        alt=""
+                                                                    />
+                                                                </span>
+                                                            </button>
                                                         </li>
-                                                        <li>
-                                                            <a href="">Fashion</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="">kid</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="">Fakoli</a>
+                                                        <li className="nav-item" role="presentation">
+                                                            <button className="nav-link" data-bs-toggle="tab" data-bs-target="#img-3" type="button">
+                                                                <span className="thumb">
+                                                                    <img
+                                                                        className="img-fluid"
+                                                                        src="assets/images/products/product-details/product-thumb-3.webp"
+                                                                        alt=""
+                                                                    />
+                                                                </span>
+                                                            </button>
                                                         </li>
                                                     </ul>
+                                                </div>
+                                                <div className="col-md-9">
+                                                    <div className="product-large-image tab-content">
+                                                        <div className="tab-pane fade show active" id="img-1" role="tabpanel">
+                                                            <div className="image">
+                                                                <img
+                                                                    className="img-fluid"
+                                                                    src="assets/images/products/product-details/product-large-1.webp"
+                                                                    alt=""
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="tab-pane fade" id="img-2" role="tabpanel">
+                                                            <div className="image">
+                                                                <img
+                                                                    className="img-fluid"
+                                                                    src="assets/images/products/product-details/product-large-2.webp"
+                                                                    alt=""
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="tab-pane fade" id="img-3" role="tabpanel">
+                                                            <div className="image">
+                                                                <img
+                                                                    className="img-fluid"
+                                                                    src="assets/images/products/product-details/product-large-3.webp"
+                                                                    alt=""
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-xl-8 offset-xl-1 col-lg-9">
-                                        <ul className="product-shop-filter-info">
-                                            <li className="prduct-item-traking">
-                                                <span>total 08 of 40</span>
-                                            </li>
-                                            <li className="prduct-item-filter">
-                                                <select name="choice">
-                                                    <option value="first">New Arrival</option>
-                                                    <option value="second" selected>
-                                                        Featured
-                                                    </option>
-                                                    <option value="third">Popular</option>
-                                                </select>
-                                            </li>
-                                        </ul>
-                                        <div className="product-shop-list-items">
-                                            <div className="row mb-n25">
-                                                <div className="col-md-6 col-12 mb-25">
-                                                    <div className="product-single-item-style-1">
-                                                        <a href="product-details-default.html" className="image img-responsive">
-                                                            <img
-                                                                className="img-fluid"
-                                                                src="assets/images/products/default/product-default-style-1-img-1.webp"
-                                                                alt=""
-                                                            />
-                                                            <ul className="tooltip-tag-items">
-                                                                <li className="color-green">15%</li>
-                                                            </ul>
-                                                        </a>
-                                                        <div className="content">
-                                                            <div className="top">
-                                                                <span className="catagory">MEN</span>
-                                                                <h4 className="title">
-                                                                    <a href="product-details-default.html">Man's Outdoor Shirt</a>
-                                                                </h4>
-                                                                <span className="price">
-                                                                    $355.00 <del>$400.00</del>
-                                                                </span>
-                                                            </div>
-                                                            <div className="bottom">
-                                                                <ul className="review-star">
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star_half</span>
-                                                                    </li>
-                                                                </ul>
-                                                                <div className="product-event-items">
-                                                                    <a href="cart.html" className="btn cart-btn">
-                                                                        Add to cart
-                                                                    </a>
-                                                                    <a href="wishlist.html" className="btn wishlist-btn">
-                                                                        <span className="material-icons">favorite_border</span>
-                                                                    </a>
-                                                                </div>
+                                    <div className="col-xxl-4 col-lg-6">
+                                        <div className="product-content">
+                                            <span className="catagory">Women</span>
+                                            <h2 className="title">Stylish women court gray 2DX m</h2>
+                                            <span className="author">Design: kakakoli Fashion</span>
+                                            <div className="bottom">
+                                                <ul className="review-star">
+                                                    <li className="fill">
+                                                        <span className="material-icons">star</span>
+                                                    </li>
+                                                    <li className="fill">
+                                                        <span className="material-icons">star</span>
+                                                    </li>
+                                                    <li className="fill">
+                                                        <span className="material-icons">star</span>
+                                                    </li>
+                                                    <li className="fill">
+                                                        <span className="material-icons">star</span>
+                                                    </li>
+                                                    <li className="fill">
+                                                        <span className="material-icons">star_half</span>
+                                                    </li>
+                                                </ul>
+
+                                                <a href="wishlist.html" className="wishlist">
+                                                    Add Wishlist
+                                                </a>
+                                            </div>
+
+                                            <span className="price">
+                                                $550.00 <del>$650.00</del>
+                                            </span>
+
+                                            <div className="product-variables">
+                                                <div className="product-variable-color">
+                                                    <h6 className="title">Color</h6>
+                                                    <ul className="color-select">
+                                                        <li>
+                                                            <label className="checkbox-default" htmlFor="color-red">
+                                                                <input type="checkbox" id="color-red" />
+                                                                <span>Red</span>
+                                                            </label>
+                                                        </li>
+                                                        <li>
+                                                            <label className="checkbox-default" htmlFor="color-green">
+                                                                <input type="checkbox" id="color-green" />
+                                                                <span>Green</span>
+                                                            </label>
+                                                        </li>
+                                                        <li>
+                                                            <label className="checkbox-default" htmlFor="color-blue">
+                                                                <input type="checkbox" id="color-blue" />
+                                                                <span>Blue</span>
+                                                            </label>
+                                                        </li>
+                                                        <li>
+                                                            <label className="checkbox-default" htmlFor="color-black">
+                                                                <input type="checkbox" id="color-black" />
+                                                                <span>Black</span>
+                                                            </label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <ul className="variable-items">
+                                                    <li className="variable-single-items type-select">
+                                                        <select>
+                                                            <option value="S">Size: S</option>
+                                                            <option value="M">Size: M</option>
+                                                            <option value="L">Size: L</option>
+                                                            <option value="XL" selected>
+                                                                Size: XL
+                                                            </option>
+                                                            <option value="XXl">Size: XXL</option>
+                                                        </select>
+                                                    </li>
+                                                    <li className="variable-single-items">
+                                                        <div className="num-block skin-2">
+                                                            <div className="num-in">
+                                                                <span className="minus dis"></span>
+                                                                <input type="text" className="in-num" value="1" readOnly />
+                                                                <span className="plus"></span>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-6 col-12 mb-25">
-                                                    <div className="product-single-item-style-1">
-                                                        <a href="product-details-default.html" className="image img-responsive">
-                                                            <img
-                                                                className="img-fluid"
-                                                                src="assets/images/products/default/product-default-style-1-img-2.webp"
-                                                                alt=""
-                                                            />
+                                                    </li>
+                                                    <li className="variable-single-items">
+                                                        <a href="cart.html" className="btn btn-sm btn-default">
+                                                            Add To Cart
                                                         </a>
-                                                        <div className="content">
-                                                            <div className="top">
-                                                                <span className="catagory">WOMEN</span>
-                                                                <h4 className="title">
-                                                                    <a href="product-details-default.html">Women Summer deal</a>
-                                                                </h4>
-                                                                <span className="price">$550.00</span>
-                                                            </div>
-                                                            <div className="bottom">
-                                                                <ul className="review-star">
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star_half</span>
-                                                                    </li>
-                                                                </ul>
-                                                                <div className="product-event-items">
-                                                                    <a href="cart.html" className="btn cart-btn">
-                                                                        Add to cart
-                                                                    </a>
-                                                                    <a href="wishlist.html" className="btn wishlist-btn">
-                                                                        <span className="material-icons">favorite_border</span>
-                                                                    </a>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="product-description-section section-fluid-270 section-top-gap-100">
+                    <div className="box-wrapper">
+                        <div className="product-description-wrapper">
+                            <div className="container-fluid">
+                                <div className="row justify-content-center">
+                                    <div className="col-xl-8 col-lg-10">
+                                        <div className="product-description-content">
+                                            <h6 className="title">Description</h6>
+                                            <p>
+                                                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                                                industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
+                                                scrambled it to make a type specimen book. It has survivedLorem Ipsum is simply dummy text of the
+                                                printing and typesetting industry. Lorem Ipsum has been{' '}
+                                            </p>
+
+                                            <p>
+                                                the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                                                and scrambled it to make a type specimen book
+                                            </p>
+
+                                            <ul className="items-info-list">
+                                                <li>There are many variations of passages</li>
+                                                <li>If you are going to use a passage of Lorem Ipsum.</li>
+                                                <li>The generated Lorem Ipsum is therefore</li>
+                                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+                                                <li>At vero eos et accusamus et iusto odio dignissimos</li>
+                                            </ul>
+
+                                            <p>
+                                                the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                                                and scrambled it to make a type specimen book
+                                            </p>
+
+                                            <div className="social-links">
+                                                <span className="text">Share:</span>
+                                                <div className="items">
+                                                    <a href="https://example.com/">
+                                                        <img className="icon-svg" src="assets/images/icons/icon-facebook-f-dark.svg" alt="" />
+                                                    </a>
+                                                    <a href="https://example.com/">
+                                                        <img className="icon-svg" src="assets/images/icons/icon-twitter-dark.svg" alt="" />
+                                                    </a>
+                                                    <a href="https://example.com/">
+                                                        <img className="icon-svg" src="assets/images/icons/icon-pinterest-p-dark.svg" alt="" />
+                                                    </a>
+                                                    <a href="https://example.com/">
+                                                        <img className="icon-svg" src="assets/images/icons/icon-dribbble-dark.svg" alt="" />
+                                                    </a>
                                                 </div>
-                                                <div className="col-md-6 col-12 mb-25">
-                                                    <div className="product-single-item-style-1">
-                                                        <a href="product-details-default.html" className="image img-responsive">
-                                                            <img
-                                                                className="img-fluid"
-                                                                src="assets/images/products/default/product-default-style-1-img-3.webp"
-                                                                alt=""
-                                                            />
-                                                        </a>
-                                                        <div className="content">
-                                                            <div className="top">
-                                                                <span className="catagory">WOMEN</span>
-                                                                <h4 className="title">
-                                                                    <a href="product-details-default.html">Women Luxury Party</a>
-                                                                </h4>
-                                                                <span className="price">$1050.00</span>
-                                                            </div>
-                                                            <div className="bottom">
-                                                                <ul className="review-star">
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star_half</span>
-                                                                    </li>
-                                                                </ul>
-                                                                <div className="product-event-items">
-                                                                    <a href="cart.html" className="btn cart-btn">
-                                                                        Add to cart
-                                                                    </a>
-                                                                    <a href="wishlist.html" className="btn wishlist-btn">
-                                                                        <span className="material-icons">favorite_border</span>
-                                                                    </a>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="product-item-section section-fluid-270 section-top-gap-100">
+                    <div className="box-wrapper">
+                        <div className="section-wrapper">
+                            <div className="container-fluid">
+                                <div className="row justify-content-between align-items-center flex-warp section-content-gap-60">
+                                    <div className="col-xxl-4 col-lg-5 col-md-6 col-sm-8 col-auto me-5">
+                                        <div className="section-content">
+                                            <h2 className="section-title">Related Products</h2>
+                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                                        </div>
+                                    </div>
+                                    <div className="col-auto">
+                                        <div className="top-slider-buttons">
+                                            <div className="slider-buttons">
+                                                <div className="slider-button button-prev">
+                                                    <span className="material-icons">arrow_left</span>
                                                 </div>
-                                                <div className="col-md-6 col-12 mb-25">
+                                                <div className="slider-button button-next">
+                                                    <span className="material-icons">arrow_right</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="product-item-wrapper">
+                            <div className="container-fluid">
+                                <div className="row">
+                                    <div className="col-12">
+                                        <div className="product-slider-3grids-1row">
+                                            <div className="swiper-container">
+                                                <div className="swiper-wrapper">
                                                     <div className="product-single-item-style-1 swiper-slide">
                                                         <a href="product-details-default.html" className="image img-responsive">
                                                             <img
@@ -1024,8 +969,101 @@ export default function StorePage() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="col-md-6 col-12 mb-25">
+                                                    <div className="product-single-item-style-1 swiper-slide">
+                                                        <a href="product-details-default.html" className="image img-responsive">
+                                                            <img
+                                                                className="img-fluid"
+                                                                src="assets/images/products/default/product-default-style-1-img-4.webp"
+                                                                alt=""
+                                                            />
+                                                        </a>
+                                                        <div className="content">
+                                                            <div className="top">
+                                                                <span className="catagory">WOMEN</span>
+                                                                <h4 className="title">
+                                                                    <a href="product-details-default.html">Slightly jackets XL Cool </a>
+                                                                </h4>
+                                                                <span className="price">$350.00</span>
+                                                            </div>
+                                                            <div className="bottom">
+                                                                <ul className="review-star">
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star</span>
+                                                                    </li>
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star</span>
+                                                                    </li>
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star</span>
+                                                                    </li>
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star</span>
+                                                                    </li>
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star_half</span>
+                                                                    </li>
+                                                                </ul>
+                                                                <div className="product-event-items">
+                                                                    <a href="cart.html" className="btn cart-btn">
+                                                                        Add to cart
+                                                                    </a>
+                                                                    <a href="wishlist.html" className="btn wishlist-btn">
+                                                                        <span className="material-icons">favorite_border</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="product-single-item-style-1 swiper-slide">
+                                                        <a href="product-details-default.html" className="image img-responsive">
+                                                            <img
+                                                                className="img-fluid"
+                                                                src="assets/images/products/default/product-default-style-1-img-6.webp"
+                                                                alt=""
+                                                            />
+                                                            <ul className="tooltip-tag-items">
+                                                                <li className="color-green">15%</li>
+                                                            </ul>
+                                                        </a>
+                                                        <div className="content">
+                                                            <div className="top">
+                                                                <span className="catagory">Bag</span>
+                                                                <h4 className="title">
+                                                                    <a href="product-details-default.html">Distracted XL bag</a>
+                                                                </h4>
+                                                                <span className="price">
+                                                                    $1200.00 <del>$1500.00</del>
+                                                                </span>
+                                                            </div>
+                                                            <div className="bottom">
+                                                                <ul className="review-star">
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star</span>
+                                                                    </li>
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star</span>
+                                                                    </li>
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star</span>
+                                                                    </li>
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star</span>
+                                                                    </li>
+                                                                    <li className="fill">
+                                                                        <span className="material-icons">star_half</span>
+                                                                    </li>
+                                                                </ul>
+                                                                <div className="product-event-items">
+                                                                    <a href="cart.html" className="btn cart-btn">
+                                                                        Add to cart
+                                                                    </a>
+                                                                    <a href="wishlist.html" className="btn wishlist-btn">
+                                                                        <span className="material-icons">favorite_border</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div className="product-single-item-style-1 swiper-slide">
                                                         <a href="product-details-default.html" className="image img-responsive">
                                                             <img
@@ -1076,9 +1114,7 @@ export default function StorePage() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="col-md-6 col-12 mb-25">
-                                                    <div className="product-single-item-style-1">
+                                                    <div className="product-single-item-style-1 swiper-slide">
                                                         <a href="product-details-default.html" className="image img-responsive">
                                                             <img
                                                                 className="img-fluid"
@@ -1123,56 +1159,7 @@ export default function StorePage() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="col-md-6 col-12 mb-25">
-                                                    <div className="product-single-item-style-1">
-                                                        <a href="product-details-default.html" className="image img-responsive">
-                                                            <img
-                                                                className="img-fluid"
-                                                                src="assets/images/products/default/product-default-style-1-img-4.webp"
-                                                                alt=""
-                                                            />
-                                                        </a>
-                                                        <div className="content">
-                                                            <div className="top">
-                                                                <span className="catagory">WOMEN</span>
-                                                                <h4 className="title">
-                                                                    <a href="product-details-default.html">Slightly jackets XL Cool </a>
-                                                                </h4>
-                                                                <span className="price">$350.00</span>
-                                                            </div>
-                                                            <div className="bottom">
-                                                                <ul className="review-star">
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star</span>
-                                                                    </li>
-                                                                    <li className="fill">
-                                                                        <span className="material-icons">star_half</span>
-                                                                    </li>
-                                                                </ul>
-                                                                <div className="product-event-items">
-                                                                    <a href="cart.html" className="btn cart-btn">
-                                                                        Add to cart
-                                                                    </a>
-                                                                    <a href="wishlist.html" className="btn wishlist-btn">
-                                                                        <span className="material-icons">favorite_border</span>
-                                                                    </a>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-6 col-12 mb-25">
-                                                    <div className="product-single-item-style-1">
+                                                    <div className="product-single-item-style-1 swiper-slide">
                                                         <a href="product-details-default.html" className="image img-responsive">
                                                             <img
                                                                 className="img-fluid"
@@ -1219,34 +1206,6 @@ export default function StorePage() {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        <div className="d-flex justify-content-center">
-                                            <ul className="page-pagination">
-                                                <li className="icon-direction icon-direction--prev">
-                                                    <a href="#">
-                                                        <span className="material-icons-outlined">arrow_left</span>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">1</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">2</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">3</a>
-                                                </li>
-                                                <li>...</li>
-                                                <li>
-                                                    <a href="#">10</a>
-                                                </li>
-                                                <li className="icon-direction icon-direction--next">
-                                                    <a href="#">
-                                                        <span className="material-icons-outlined">arrow_right</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -1492,6 +1451,7 @@ export default function StorePage() {
                         </div>
                     </div>
                 </footer>
+
                 <div id="scroll-to-top" className="scroll-to-top">
                     <span className="material-icons-outlined">expand_less</span>
                 </div>

@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
+Route::get('/store', [HomeController::class, 'store'])->name('store');
+Route::get('/cart', [HomeController::class, 'cart'])->name('cart');
+Route::get('/product/{product}', [HomeController::class, 'show'])->name('product.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

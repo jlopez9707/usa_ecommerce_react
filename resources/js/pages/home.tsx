@@ -25,25 +25,11 @@ import '@/assets/js/plugins/venobox.min.js';
 
 import '@/assets/js/main.js';
 
-import bannerSquareNormal1 from '@/assets/images/banner/banner-square-normal-1.webp';
-import bannerSquareNormal2 from '@/assets/images/banner/banner-square-normal-2.webp';
-import bannerSquareNormal3 from '@/assets/images/banner/banner-square-normal-3.webp';
-import bannerSquareNormal4 from '@/assets/images/banner/banner-square-normal-4.webp';
-import bannerSquareLarge from '@/assets/images/banner/banner-squre-large.webp';
 import bannerWide2 from '@/assets/images/banner/banner-wide-2.webp';
-import portraitBanner1 from '@/assets/images/banner/portrait-banner-1.webp';
-import portraitBanner2 from '@/assets/images/banner/portrait-banner-2.webp';
-import portraitBanner3 from '@/assets/images/banner/portrait-banner-3.webp';
-import companyLogo1 from '@/assets/images/company-logo/company-logo-1.png';
-import companyLogo2 from '@/assets/images/company-logo/company-logo-2.png';
-import companyLogo3 from '@/assets/images/company-logo/company-logo-3.png';
-import companyLogo4 from '@/assets/images/company-logo/company-logo-4.png';
-import companyLogo5 from '@/assets/images/company-logo/company-logo-5.png';
 import paymentLogo from '@/assets/images/company-logo/payment-logo.png';
 import heroSlider1 from '@/assets/images/hero-slider/hero-slider-style-2-img-1.png';
 import heroSlider2 from '@/assets/images/hero-slider/hero-slider-style-2-img-2.png';
 import heroSlider3 from '@/assets/images/hero-slider/hero-slider-style-2-img-3.png';
-import googleplayAppButton from '@/assets/images/icons/googleplay-app-button.png';
 import heroSliderBottomShape from '@/assets/images/icons/hero-slider-2-bottom-shape.svg';
 import heroSliderTopShape from '@/assets/images/icons/hero-slider-2-top-shape.svg';
 import iconArrowDropDown from '@/assets/images/icons/icon-arrow-drop-down.svg';
@@ -60,12 +46,6 @@ import iconShoppingBagDark from '@/assets/images/icons/icon-shopping-bag-dark.sv
 import iconShoppingBagLight from '@/assets/images/icons/icon-shopping-bag-light.svg';
 import iconTrash from '@/assets/images/icons/icon-trash.svg';
 import iconTwitterDark from '@/assets/images/icons/icon-twitter-dark.svg';
-import iphoneAppButton from '@/assets/images/icons/iphone-app-button.png';
-import newsletterCloudComputing from '@/assets/images/icons/newsletter-cloud-computing.svg';
-import newsletterPaperPlane from '@/assets/images/icons/newsletter-paper-plane.svg';
-import shippingIcon4 from '@/assets/images/icons/shipping-icon-4.svg';
-import shippingIcon5 from '@/assets/images/icons/shipping-icon-5.svg';
-import shippingIcon6 from '@/assets/images/icons/shipping-icon-6.svg';
 import logoDarkTheme from '@/assets/images/logo/logo-dark-theme.png';
 import logoLightTheme from '@/assets/images/logo/logo-light-theme.png';
 import productDefault1 from '@/assets/images/products/default/product-default-style-2-img-1.webp';
@@ -88,17 +68,6 @@ export default function HomePage() {
                     href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
                     rel="stylesheet"
                 />
-                <script src="/assets/js/vendor/modernizr-3.11.2.min.js"></script>
-                <script src="/assets/js/vendor/jquery-3.6.0.min.js"></script>
-                <script src="/assets/js/vendor/jquery-migrate-3.3.2.min.js"></script>
-                <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
-                <script src="/assets/js/vendor/jquery-ui.min.js"></script>
-                <script src="/assets/js/plugins/jquery.nice-select.js"></script>
-                <script src="/assets/js/plugins/swiper-bundle.min.js"></script>
-                <script src="/assets/js/plugins/ion.rangeSlider.min.js"></script>
-                <script src="/assets/js/plugins/venobox.min.js"></script>
-                <script src="/assets/js/plugins/ajax-mail.js"></script>
-                <script src="/assets/js/main.js"></script>
             </Head>
             <div>
                 <header className="header-section pos-absolute dark-bg sticky-header d-none d-lg-block section-fluid-270">
@@ -794,176 +763,6 @@ export default function HomePage() {
                     </div>
                 </div>
 
-                <div className="banner-portrait-section section-fluid-270 section-top-gap-100 pos-relative">
-                    <div className="section-wrapper section-orientation-vertical">
-                        <div className="container-fluid">
-                            <div className="row">
-                                <div className="col-12">
-                                    <div className="section-content text-uppercase">
-                                        <span className="title-tag">Choose you </span>
-                                        <h2 className="section-title has-underline">Categories</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="box-wrapper">
-                        <div className="banner-portrait-wrapper">
-                            <div className="container-fluid">
-                                <div className="row mb-n20">
-                                    <div className="col-md-3 offset-md-2 col-sm-4 col-12 mb-20">
-                                        <div className="banner-animate--flash">
-                                            <a href="shop-grid-sidebar-left.html" className="banner-portrait-single-item img-responsive">
-                                                <div className="image">
-                                                    <img className="img-fluid" src={portraitBanner1} alt="" />
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-3 col-sm-4 col-12 mb-20">
-                                        <div className="banner-animate--flash">
-                                            <a href="shop-grid-sidebar-left.html" className="banner-portrait-single-item img-responsive">
-                                                <div className="image">
-                                                    <img className="img-fluid" src={portraitBanner2} alt="" />
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-3 col-sm-4 col-12 mb-20">
-                                        <div className="banner-animate--flash">
-                                            <a href="shop-grid-sidebar-left.html" className="banner-portrait-single-item img-responsive">
-                                                <div className="image">
-                                                    <img className="img-fluid" src={portraitBanner3} alt="" />
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="shipping-section section-fluid-270 section-top-gap-100">
-                    <div className="box-wrapper">
-                        <div className="section-wrapper">
-                            <div className="container-fluid">
-                                <div className="row justify-content-center">
-                                    <div className="col-xl-4 col-lg-5 col-md-6 col-sm-7 col-10">
-                                        <div className="section-content section-content-gap-60 text-center">
-                                            <h2 className="section-title fw-bold">Why we are best</h2>
-                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="shipping-wrapper">
-                            <div className="container-fluid">
-                                <div className="row justify-content-center justify-content-sm-start mb-n40">
-                                    <div className="col-lg-3 col-sm-6 col-12 mb-40">
-                                        <div className="shipping-single-item--style-2">
-                                            <div className="icon">
-                                                <img className="img-fluid" src={shippingIcon4} alt="" />
-                                            </div>
-                                            <div className="content">
-                                                <h4 className="title">Money Back Guarantee</h4>
-                                                <p>There are many variations of passages of Lorem Ipsum available.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-3 offset-xl-1 col-sm-6 col-12 mb-40">
-                                        <div className="shipping-single-item--style-2">
-                                            <div className="icon">
-                                                <img className="img-fluid" src={shippingIcon5} alt="" />
-                                            </div>
-                                            <div className="content">
-                                                <h4 className="title">Take a Great Discount</h4>
-                                                <p>There are many variations of passages of Lorem Ipsum available.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-3 offset-xl-1 col-sm-6 col-12 mb-40">
-                                        <div className="shipping-single-item--style-2">
-                                            <div className="icon">
-                                                <img className="img-fluid" src={shippingIcon6} alt="" />
-                                            </div>
-                                            <div className="content">
-                                                <h4 className="title">Free Shipping</h4>
-                                                <p>There are many variations of passages of Lorem Ipsum available.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="banner-mixed-section section-fluid-270 section-top-gap-100">
-                    <div className="box-wrapper">
-                        <div className="section-wrapper">
-                            <div className="container-fluid">
-                                <div className="row justify-content-center">
-                                    <div className="col-xl-4 col-lg-5 col-md-6 col-sm-7 col-10">
-                                        <div className="section-content section-content-gap-60 text-center">
-                                            <h2 className="section-title fw-normal">
-                                                <span className="fw-bold"> Discounted </span> Products
-                                            </h2>
-                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="banner-square-wrapper">
-                            <div className="container-fluid">
-                                <div className="row mb-n20">
-                                    <div className="col-xl-6 col-md-6 mb-20">
-                                        <div className="banner-square-single-item banner-animate--flash">
-                                            <a href="shop-grid-sidebar-left.html" className="image img-responsive">
-                                                <img src={bannerSquareLarge} alt="" />
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-6 col-md-6">
-                                        <div className="row mb-n20">
-                                            <div className="col-sm-6 mb-20">
-                                                <div className="banner-square-single-item banner-animate--flash">
-                                                    <a href="shop-grid-sidebar-left.html" className="image img-responsive">
-                                                        <img src={bannerSquareNormal1} alt="" />
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <div className="col-sm-6 mb-20">
-                                                <div className="banner-square-single-item banner-animate--flash">
-                                                    <a href="shop-grid-sidebar-left.html" className="image img-responsive">
-                                                        <img src={bannerSquareNormal2} alt="" />
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <div className="col-sm-6 mb-20">
-                                                <div className="banner-square-single-item banner-animate--flash">
-                                                    <a href="shop-grid-sidebar-left.html" className="image img-responsive">
-                                                        <img src={bannerSquareNormal3} alt="" />
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <div className="col-sm-6 mb-20">
-                                                <div className="banner-square-single-item banner-animate--flash">
-                                                    <a href="shop-grid-sidebar-left.html" className="image img-responsive">
-                                                        <img src={bannerSquareNormal4} alt="" />
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div className="product-tab-items-section section-fluid-270 section-top-gap-100">
                     <div className="box-wrapper">
                         <div className="section-wrapper d-none">
@@ -1561,96 +1360,6 @@ export default function HomePage() {
                                         <a href="shop-grid-sidebar-left.html" className="d-block banner-animate--wave">
                                             <img className="img-fluid" src={bannerWide2} alt="" />
                                         </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="company-logo-section section-fluid-270 section-top-gap-100">
-                    <div className="box-wrapper">
-                        <div className="company-logo-wrapper">
-                            <div className="container-fluid">
-                                <div className="row">
-                                    <div className="col-12">
-                                        <div className="company-slider">
-                                            <div className="swiper-container">
-                                                <div className="swiper-wrapper">
-                                                    <a href="#" className="company-slider-single-item swiper-slide">
-                                                        <div className="image">
-                                                            <img className="img-fluid" src={companyLogo1} alt="" />
-                                                        </div>
-                                                    </a>
-                                                    <a href="#" className="company-slider-single-item swiper-slide">
-                                                        <div className="image">
-                                                            <img className="img-fluid" src={companyLogo2} alt="" />
-                                                        </div>
-                                                    </a>
-                                                    <a href="#" className="company-slider-single-item swiper-slide">
-                                                        <div className="image">
-                                                            <img className="img-fluid" src={companyLogo3} alt="" />
-                                                        </div>
-                                                    </a>
-                                                    <a href="#" className="company-slider-single-item swiper-slide">
-                                                        <div className="image">
-                                                            <img className="img-fluid" src={companyLogo4} alt="" />
-                                                        </div>
-                                                    </a>
-                                                    <a href="#" className="company-slider-single-item swiper-slide">
-                                                        <div className="image">
-                                                            <img className="img-fluid" src={companyLogo5} alt="" />
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="newsletter-section section-fluid-270 section-top-gap-100">
-                    <div className="box-wrapper">
-                        <div className="newsletter-wrapper">
-                            <div className="container-fluid">
-                                <div className="col-12">
-                                    <div className="newsletter-area newsletter-area-style-2">
-                                        <div className="content content-left">
-                                            <h4 className="title">Newsletter</h4>
-                                            <p>
-                                                Lorem Ipsum is simply dummy text of the printing. <br />
-                                                printing and typesetting industry.
-                                            </p>
-                                            <div className="newsletter-form">
-                                                <input type="email" placeholder="Enter your email" required />
-                                                <button type="submit">Subscribe</button>
-                                            </div>
-                                            <div className="image-shape image-shape-left">
-                                                <img className="img-fluid" src={newsletterPaperPlane} alt="" />
-                                            </div>
-                                        </div>
-                                        <div className="content content-right">
-                                            <h4 className="title">Download App</h4>
-                                            <p>
-                                                Lorem Ipsum is simply dummy text of the printing. <br />
-                                                printing and typesetting industry.
-                                            </p>
-
-                                            <div className="apps-btn">
-                                                <a href="#">
-                                                    <img className="img-fluid" src={iphoneAppButton} alt="" />
-                                                </a>
-                                                <a href="#">
-                                                    <img className="img-fluid" src={googleplayAppButton} alt="" />
-                                                </a>
-                                            </div>
-                                            <div className="image-shape image-shape-right">
-                                                <img className="img-fluid" src={newsletterCloudComputing} alt="" />
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
