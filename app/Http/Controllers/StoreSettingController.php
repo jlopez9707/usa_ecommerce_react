@@ -11,7 +11,7 @@ class StoreSettingController extends Controller
     public function index()
     {
         $storeSettings = StoreSetting::all();
-        return Inertia::render('storeSettings/index', compact('storeSettings'));
+        return Inertia::render('admin/storeSettings/index', compact('storeSettings'));
     }
 
     public function update(Request $request, StoreSetting $storeSetting)
@@ -21,6 +21,6 @@ class StoreSettingController extends Controller
             'description' => 'required',
         ]);
 
-        return redirect()->route('storeSettings.index')->with('success', 'Configuraciones de la tienda actualizadas exitosamente');
+        return redirect()->route('admin.storeSettings.index')->with('success', 'Configuraciones de la tienda actualizadas exitosamente');
     }
 }

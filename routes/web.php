@@ -21,7 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::resource('products', ProductController::class)->names('admin.products');
         Route::resource('categories', CategoryController::class)->names('admin.categories');
-        Route::resource('store-settings', StoreSettingController::class)->names("storeSettings");
+        Route::resource('storeSettings', StoreSettingController::class)->names('admin.storeSettings');
     });
 });
 

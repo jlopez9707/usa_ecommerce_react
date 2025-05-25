@@ -1,9 +1,18 @@
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Category } from '@/types/categories';
+import {
+    Button as AntButton,
+    Descriptions,
+    Typography,
+    Divider,
+    Space,
+} from 'antd';
+import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 
 interface Props {
     category: Category;
@@ -23,63 +32,50 @@ export default function ShowCategory({ category }: Props) {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle>Detalles de la Categoría</CardTitle>
-                            <div className="flex space-x-2">
-                                <Button
-                                    variant="outline"
-                                    asChild
+                            <div className="flex space-x-4">
+                                <AntButton
+                                    icon={<ArrowLeftOutlined />}
+                                    onClick={() => window.history.back()}
                                 >
-                                    <Link href={route('admin.categories.edit', category.id)}>
+                                    Volver
+                                </AntButton>
+                                <Link href={route('admin.categories.edit', category.id)}>
+                                    <AntButton
+                                        type="primary"
+                                        icon={<EditOutlined />}
+                                    >
                                         Editar
-                                    </Link>
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    asChild
-                                >
-                                    <Link href={route('admin.categories.index')}>
-                                        Volver
-                                    </Link>
-                                </Button>
+                                    </AntButton>
+                                </Link>
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 gap-6">
+                            <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-lg font-medium">Información General</h3>
-                                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                                ID
-                                            </p>
-                                            <p>{category.id}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                                Nombre
-                                            </p>
-                                            <p>{category.name}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                                Fecha de Creación
-                                            </p>
-                                            <p>{new Date(category.created_at).toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                                Última Actualización
-                                            </p>
-                                            <p>{new Date(category.updated_at).toLocaleString()}</p>
-                                        </div>
-                                    </div>
+                                    <Title level={2}>{category.name}</Title>
                                 </div>
 
-                                {category.description && (
-                                    <div>
-                                        <h3 className="text-lg font-medium">Descripción</h3>
-                                        <p className="mt-2">{category.description}</p>
-                                    </div>
-                                )}
+                                <Divider />
+
+                                <Descriptions title="Información de la Categoría" column={1} bordered>
+                                    <Descriptions.Item label="ID">
+                                        {category.id}
+                                    </Descriptions.Item>
+
+                                    {category.description && (
+                                        <Descriptions.Item label="Descripción">
+                                            {category.description}
+                                        </Descriptions.Item>
+                                    )}
+
+                                    <Descriptions.Item label="Fecha de Creación">
+                                        {new Date(category.created_at).toLocaleString()}
+                                    </Descriptions.Item>
+
+                                    <Descriptions.Item label="Última Actualización">
+                                        {new Date(category.updated_at).toLocaleString()}
+                                    </Descriptions.Item>
+                                </Descriptions>
                             </div>
                         </CardContent>
                     </Card>
