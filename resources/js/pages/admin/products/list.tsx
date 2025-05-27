@@ -255,13 +255,15 @@ export default function ProductList({ products, filters }: Props) {
             title: 'Acciones',
             key: 'actions',
             width: 150,
+            align: 'center',
             render: (_, record) => (
-                <Space size="small">
+                <Space size="middle" className="flex justify-center">
                     <Link href={route('admin.products.show', record.id)}>
                         <AntButton
                             type="text"
                             icon={<EyeOutlined />}
                             title="Ver"
+                            className="flex items-center justify-center"
                         />
                     </Link>
                     <Link href={route('admin.products.edit', record.id)}>
@@ -269,6 +271,7 @@ export default function ProductList({ products, filters }: Props) {
                             type="text"
                             icon={<EditOutlined />}
                             title="Editar"
+                            className="flex items-center justify-center"
                         />
                     </Link>
                     <AntButton
@@ -276,6 +279,7 @@ export default function ProductList({ products, filters }: Props) {
                         danger
                         icon={<DeleteOutlined />}
                         title="Eliminar"
+                        className="flex items-center justify-center"
                         onClick={() => handleDelete(record.id)}
                     />
                 </Space>
