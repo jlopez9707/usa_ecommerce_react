@@ -1,8 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Category } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { type Product } from '@/types/product';
 import {
     Button as AntButton,
     Descriptions,
@@ -14,6 +13,8 @@ import {
     Carousel
 } from 'antd';
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Category } from '@/types/categories';
+import { Product } from '@/types/product';
 
 const { Title, Text } = Typography;
 
@@ -92,38 +93,7 @@ export default function ShowProduct({ product }: Props) {
                                                 </Space>
                                             </Descriptions.Item>
                                         )}
-
-                                        {product.color && (
-                                            <Descriptions.Item label="Color">
-                                                {product.color}
-                                            </Descriptions.Item>
-                                        )}
-
-                                        {product.size && (
-                                            <Descriptions.Item label="Talla">
-                                                {product.size}
-                                            </Descriptions.Item>
-                                        )}
-
-                                        {product.material && (
-                                            <Descriptions.Item label="Material">
-                                                {product.material}
-                                            </Descriptions.Item>
-                                        )}
                                     </Descriptions>
-
-                                    {product.measurements && Object.keys(product.measurements).length > 0 && (
-                                        <div>
-                                            <Divider orientation="left">Medidas</Divider>
-                                            <Descriptions bordered column={2}>
-                                                {Object.entries(product.measurements).map(([key, value]) => (
-                                                    <Descriptions.Item key={key} label={key}>
-                                                        {value}
-                                                    </Descriptions.Item>
-                                                ))}
-                                            </Descriptions>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                             <div className="flex justify-end space-x-4 mt-6">

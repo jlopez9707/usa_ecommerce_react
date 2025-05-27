@@ -3,8 +3,8 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, PageProps } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
-import { Table, Input as AntInput, Button as AntButton, Tag, Space, Tooltip, Pagination, notification } from 'antd';
-import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
+import { Table, Input as AntInput, Button as AntButton, Tag, Space, Tooltip, Pagination, notification, Modal } from 'antd';
+import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { Product } from '@/types/product';
@@ -172,6 +172,28 @@ export default function ProductList({ products, filters }: Props) {
         });
     }
 
+    const handleDelete = (productId: number) => {
+        Modal.confirm({
+            title: '¿Estás seguro de que quieres eliminar este producto?',
+            content: 'Esta acción no se puede deshacer.',
+            okText: 'Sí, eliminar',
+            okType: 'danger',
+            cancelText: 'Cancelar',
+            onOk() {
+                router.delete(route('admin.products.destroy', productId), {
+                    onError: () => {
+                        notificationApi.error({
+                            message: 'Error',
+                            description: 'Hubo un problema al eliminar el producto',
+                            placement: 'topRight',
+                            duration: 4
+                        });
+                    }
+                });
+            }
+        });
+    };
+
     const columns: ColumnsType<Product> = [
         {
             title: 'ID',
@@ -232,7 +254,7 @@ export default function ProductList({ products, filters }: Props) {
         {
             title: 'Acciones',
             key: 'actions',
-            width: 120,
+            width: 150,
             render: (_, record) => (
                 <Space size="small">
                     <Link href={route('admin.products.show', record.id)}>
@@ -249,6 +271,13 @@ export default function ProductList({ products, filters }: Props) {
                             title="Editar"
                         />
                     </Link>
+                    <AntButton
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        title="Eliminar"
+                        onClick={() => handleDelete(record.id)}
+                    />
                 </Space>
             ),
         },

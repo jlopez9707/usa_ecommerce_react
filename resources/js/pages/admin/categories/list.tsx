@@ -3,8 +3,8 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
-import { Table, Input as AntInput, Button as AntButton, Space, Tooltip, Pagination } from 'antd';
-import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
+import { Table, Input as AntInput, Button as AntButton, Space, Tooltip, Pagination, notification, Modal } from 'antd';
+import { SearchOutlined, ClearOutlined, PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { router } from '@inertiajs/react';
@@ -56,6 +56,7 @@ const defaultFilters: FilterState = {
 };
 
 export default function CategoryList({ categories, filters }: Props) {
+    const [notificationApi, contextHolder] = notification.useNotification();
     // Estado único para todos los filtros
     const [filterState, setFilterState] = useState<FilterState>({
         search: filters.search ?? '',
@@ -151,6 +152,28 @@ export default function CategoryList({ categories, filters }: Props) {
         });
     }
 
+    const handleDelete = (categoryId: number) => {
+        Modal.confirm({
+            title: '¿Estás seguro de que quieres eliminar esta categoría?',
+            content: 'Esta acción no se puede deshacer. Los productos asociados a esta categoría perderán esta relación.',
+            okText: 'Sí, eliminar',
+            okType: 'danger',
+            cancelText: 'Cancelar',
+            onOk() {
+                router.delete(route('admin.categories.destroy', categoryId), {
+                    onError: () => {
+                        notificationApi.error({
+                            message: 'Error',
+                            description: 'Hubo un problema al eliminar la categoría',
+                            placement: 'topRight',
+                            duration: 4
+                        });
+                    }
+                });
+            }
+        });
+    };
+
     // Configuración de las columnas para la tabla de Ant Design
     const columns: ColumnsType<Category> = [
         {
@@ -186,7 +209,7 @@ export default function CategoryList({ categories, filters }: Props) {
         {
             title: 'Acciones',
             key: 'actions',
-            width: 120,
+            width: 150,
             render: (_, record) => (
                 <Space size="small">
                     <Link href={route('admin.categories.show', record.id)}>
@@ -203,6 +226,13 @@ export default function CategoryList({ categories, filters }: Props) {
                             title="Editar"
                         />
                     </Link>
+                    <AntButton
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        title="Eliminar"
+                        onClick={() => handleDelete(record.id)}
+                    />
                 </Space>
             ),
         },
