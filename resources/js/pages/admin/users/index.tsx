@@ -210,11 +210,13 @@ export default function UserIndex({ users, filters }: Props) {
       title: 'Acciones',
       key: 'action',
       render: (_, record) => (
-        <Space size="middle">
+        <Space size="small">
           <Link href={route('admin.users.edit', record.id)}>
-            <AntButton type="primary" icon={<EditOutlined />} size="small">
-              Editar
-            </AntButton>
+            <AntButton
+              type="text"
+              icon={<EditOutlined />}
+              title="Editar"
+            />
           </Link>
           <Popconfirm
             title="¿Estás seguro de eliminar este usuario?"
@@ -222,9 +224,12 @@ export default function UserIndex({ users, filters }: Props) {
             okText="Sí"
             cancelText="No"
           >
-            <AntButton danger icon={<DeleteOutlined />} size="small">
-              Eliminar
-            </AntButton>
+            <AntButton
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              title="Eliminar"
+            />
           </Popconfirm>
         </Space>
       ),

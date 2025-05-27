@@ -33,24 +33,8 @@ export default function ShowProduct({ product }: Props) {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
+                        <CardHeader>
                             <CardTitle>Detalles del Producto</CardTitle>
-                            <div className="flex space-x-4">
-                                <AntButton
-                                    icon={<ArrowLeftOutlined />}
-                                    onClick={() => window.history.back()}
-                                >
-                                    Volver
-                                </AntButton>
-                                <Link href={route('admin.products.edit', product.id)}>
-                                    <AntButton
-                                        type="primary"
-                                        icon={<EditOutlined />}
-                                    >
-                                        Editar
-                                    </AntButton>
-                                </Link>
-                            </div>
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -141,6 +125,22 @@ export default function ShowProduct({ product }: Props) {
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                            <div className="flex justify-end space-x-4 mt-6">
+                                <AntButton
+                                    icon={<ArrowLeftOutlined />}
+                                    onClick={() => window.history.back()}
+                                >
+                                    Volver
+                                </AntButton>
+                                <Link href={route('admin.products.edit', product.id)}>
+                                    <AntButton
+                                        type="primary"
+                                        icon={<EditOutlined />}
+                                    >
+                                        Editar
+                                    </AntButton>
+                                </Link>
                             </div>
                         </CardContent>
                     </Card>

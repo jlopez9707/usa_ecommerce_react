@@ -8,11 +8,10 @@ import {
     Descriptions,
     Typography,
     Divider,
-    Space,
 } from 'antd';
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 interface Props {
     category: Category;
@@ -30,24 +29,8 @@ export default function ShowCategory({ category }: Props) {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
+                        <CardHeader>
                             <CardTitle>Detalles de la Categoría</CardTitle>
-                            <div className="flex space-x-4">
-                                <AntButton
-                                    icon={<ArrowLeftOutlined />}
-                                    onClick={() => window.history.back()}
-                                >
-                                    Volver
-                                </AntButton>
-                                <Link href={route('admin.categories.edit', category.id)}>
-                                    <AntButton
-                                        type="primary"
-                                        icon={<EditOutlined />}
-                                    >
-                                        Editar
-                                    </AntButton>
-                                </Link>
-                            </div>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-6">
@@ -76,6 +59,22 @@ export default function ShowCategory({ category }: Props) {
                                         {new Date(category.updated_at).toLocaleString()}
                                     </Descriptions.Item>
                                 </Descriptions>
+                                <div className="flex justify-end space-x-4 mt-6">
+                                    <AntButton
+                                        icon={<ArrowLeftOutlined />}
+                                        onClick={() => window.history.back()}
+                                    >
+                                        Volver
+                                    </AntButton>
+                                    <Link href={route('admin.categories.edit', category.id)}>
+                                        <AntButton
+                                            type="primary"
+                                            icon={<EditOutlined />}
+                                        >
+                                            Editar
+                                        </AntButton>
+                                    </Link>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
