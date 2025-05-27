@@ -3,9 +3,10 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, PageProps } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
-import { Table, Input, Button, Tag, Space, notification, Popconfirm } from 'antd';
+import { Table, Input as AntInput, Button as AntButton, Tag, Space, notification, Popconfirm, Pagination } from 'antd';
 import { SearchOutlined, ClearOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 
 interface User {
   id: number;
@@ -14,19 +15,56 @@ interface User {
   role: string;
 }
 
+interface FilterState {
+  search: string;
+  sort_field: string;
+  sort_direction: 'asc' | 'desc';
+  page: number;
+  per_page: number;
+}
+
 interface Props {
-  users: User[];
+  users: {
+    data: User[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+  };
+  filters: {
+    search?: string;
+    sort_field?: string;
+    sort_direction?: 'asc' | 'desc';
+    page?: number;
+    per_page?: number;
+  };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Usuarios', href: '/admin/users' },
 ];
 
-export default function UserIndex({ users }: Props) {
+const defaultFilters: FilterState = {
+  search: '',
+  sort_field: 'created_at',
+  sort_direction: 'desc',
+  page: 1,
+  per_page: 10
+};
+
+export default function UserIndex({ users, filters }: Props) {
   const { flash = {} } = usePage<PageProps>().props;
-  const [searchText, setSearchText] = useState('');
   const [notificationApi, contextHolder] = notification.useNotification();
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
+  const [filterState, setFilterState] = useState<FilterState>({
+    search: filters.search ?? '',
+    sort_field: filters.sort_field ?? 'created_at',
+    sort_direction: filters.sort_direction ?? 'desc',
+    page: filters.page ?? 1,
+    per_page: filters.per_page ?? 10
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (flash?.success && typeof flash.success === 'string' && flash.success.trim() !== '') {
@@ -48,9 +86,79 @@ export default function UserIndex({ users }: Props) {
     }
   }, [flash]);
 
-  useEffect(() => {
-    setFilteredUsers(users);
-  }, [users]);
+  const updateFilter = (field: keyof FilterState, value: string | number) => {
+    setFilterState(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const applyFilters = (newFilters: Partial<FilterState> = {}) => {
+    setLoading(true);
+
+    const updatedFilters = {
+      ...filterState,
+      ...newFilters
+    };
+
+    setFilterState(updatedFilters);
+
+    const filteredParams = Object.fromEntries(
+      Object.entries(updatedFilters).filter(([, value]) =>
+        value !== undefined && value !== null && value !== ''
+      )
+    );
+
+    router.get(route('admin.users.index'), filteredParams as Record<string, string>, {
+      preserveState: true,
+      replace: true,
+      onSuccess: () => setLoading(false),
+      onError: () => setLoading(false)
+    });
+  };
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    applyFilters({ page: 1 });
+  }
+
+  function handlePerPageChange(newPerPage: number) {
+    applyFilters({ per_page: newPerPage, page: 1 });
+  }
+
+  function handlePageChange(newPage: number) {
+    applyFilters({ page: newPage });
+  }
+
+  function clearFilters() {
+    setFilterState(defaultFilters);
+    router.get(route('admin.users.index'), {}, {
+      preserveState: false,
+      replace: true
+    });
+  }
+
+  function handleSort(sorter: SorterResult<User> | SorterResult<User>[]) {
+    const { field, order } = Array.isArray(sorter) ? sorter[0] : sorter;
+
+    if (!field) return;
+
+    let newSortField: string;
+    let newSortDirection: 'asc' | 'desc';
+
+    if (order === undefined) {
+      newSortField = 'created_at';
+      newSortDirection = 'desc';
+    } else {
+      newSortField = field as string;
+      newSortDirection = order === 'ascend' ? 'asc' : 'desc';
+    }
+
+    applyFilters({
+      sort_field: newSortField,
+      sort_direction: newSortDirection
+    });
+  }
 
   const deleteUser = (id: number) => {
     router.delete(route('admin.users.destroy', id), {
@@ -65,36 +173,24 @@ export default function UserIndex({ users }: Props) {
     });
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase();
-    setSearchText(value);
-
-    const filtered = users.filter(user =>
-      user.name.toLowerCase().includes(value) ||
-      user.email.toLowerCase().includes(value) ||
-      user.role.toLowerCase().includes(value)
-    );
-
-    setFilteredUsers(filtered);
-  };
-
-  const clearSearch = () => {
-    setSearchText('');
-    setFilteredUsers(users);
-  };
-
   const columns: ColumnsType<User> = [
     {
       title: 'Nombre',
       dataIndex: 'name',
       key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: true,
+      sortOrder: filterState.sort_field === 'name'
+        ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+        : null,
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      sorter: (a, b) => a.email.localeCompare(b.email),
+      sorter: true,
+      sortOrder: filterState.sort_field === 'email'
+        ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+        : null,
     },
     {
       title: 'Rol',
@@ -105,7 +201,10 @@ export default function UserIndex({ users }: Props) {
         const text = role === 'admin' ? 'Administrador' : 'Cliente';
         return <Tag color={color}>{text}</Tag>;
       },
-      sorter: (a, b) => a.role.localeCompare(b.role),
+      sorter: true,
+      sortOrder: filterState.sort_field === 'role'
+        ? (filterState.sort_direction === 'asc' ? 'ascend' : 'descend')
+        : null,
     },
     {
       title: 'Acciones',
@@ -113,9 +212,9 @@ export default function UserIndex({ users }: Props) {
       render: (_, record) => (
         <Space size="middle">
           <Link href={route('admin.users.edit', record.id)}>
-            <Button type="primary" icon={<EditOutlined />} size="small">
+            <AntButton type="primary" icon={<EditOutlined />} size="small">
               Editar
-            </Button>
+            </AntButton>
           </Link>
           <Popconfirm
             title="¿Estás seguro de eliminar este usuario?"
@@ -123,14 +222,42 @@ export default function UserIndex({ users }: Props) {
             okText="Sí"
             cancelText="No"
           >
-            <Button danger icon={<DeleteOutlined />} size="small">
+            <AntButton danger icon={<DeleteOutlined />} size="small">
               Eliminar
-            </Button>
+            </AntButton>
           </Popconfirm>
         </Space>
       ),
     },
   ];
+
+  const handleTableChange = (
+    pagination: TablePaginationConfig,
+    _: Record<string, FilterValue | null>,
+    sorter: SorterResult<User> | SorterResult<User>[]
+  ) => {
+    if (pagination.current) {
+      handlePageChange(pagination.current);
+    }
+
+    if (pagination.pageSize && pagination.pageSize !== filterState.per_page) {
+      handlePerPageChange(pagination.pageSize);
+    }
+
+    if (sorter) {
+      const sorterObj = Array.isArray(sorter) ? sorter[0] : sorter;
+      handleSort(sorterObj);
+    }
+  };
+
+  const hasActiveFilters = () => {
+    return !!(
+      filterState.search ||
+      filterState.sort_field !== 'created_at' ||
+      filterState.sort_direction !== 'desc' ||
+      filterState.per_page !== 10
+    );
+  };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -141,42 +268,70 @@ export default function UserIndex({ users }: Props) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Lista de Usuarios</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4 flex justify-between items-center">
-                <div className="flex">
-                  <Input
+              <div className="flex space-x-2">
+                <form onSubmit={handleSearch} className="flex space-x-2">
+                  <AntInput
                     placeholder="Buscar usuarios..."
-                    value={searchText}
-                    onChange={handleSearch}
+                    value={filterState.search}
+                    onChange={e => updateFilter('search', e.target.value)}
+                    style={{ width: 200 }}
                     prefix={<SearchOutlined />}
                     allowClear
-                    className="max-w-md"
                   />
-                  {searchText && (
-                    <Button onClick={clearSearch} icon={<ClearOutlined />} className="ml-2">
-                      Limpiar
-                    </Button>
-                  )}
-                </div>
+                  <AntButton
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                  >
+                    Buscar
+                  </AntButton>
+                  <AntButton
+                    onClick={clearFilters}
+                    disabled={loading}
+                    danger={hasActiveFilters()}
+                    icon={<ClearOutlined />}
+                  >
+                    Limpiar
+                  </AntButton>
+                </form>
                 <Link href={route('admin.users.create')}>
-                  <Button type="primary" icon={<PlusOutlined />}>
+                  <AntButton type="primary" icon={<PlusOutlined />}>
                     Añadir Usuario
-                  </Button>
+                  </AntButton>
                 </Link>
               </div>
-
+            </CardHeader>
+            <CardContent>
               <Table
                 columns={columns}
-                dataSource={filteredUsers}
+                dataSource={users.data}
                 rowKey="id"
-                pagination={{
-                  pageSize: 10,
-                  hideOnSinglePage: true,
-                  showSizeChanger: true,
-                  pageSizeOptions: ['10', '20', '50'],
-                }}
+                pagination={false}
+                onChange={handleTableChange}
+                loading={loading}
+                size="middle"
+                bordered
+                sortDirections={['ascend', 'descend', 'ascend']}
+                locale={{ emptyText: 'No se encontraron usuarios' }}
               />
+
+              {users.last_page > 1 && (
+                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-0">
+                    Mostrando {users.from} a {users.to} de {users.total} resultados
+                  </div>
+                  <Pagination
+                    current={users.current_page}
+                    total={users.total}
+                    pageSize={users.per_page}
+                    onChange={handlePageChange}
+                    showSizeChanger
+                    onShowSizeChange={(_, size) => handlePerPageChange(size)}
+                    pageSizeOptions={['10', '25', '50', '100']}
+                    showTotal={(total, range) => `${range[0]}-${range[1]} de ${total} registros`}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

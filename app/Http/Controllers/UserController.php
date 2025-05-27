@@ -13,11 +13,38 @@ class UserController extends Controller
     /**
      * Display a listing of the users.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $query = User::query();
+
+        // Aplicar búsqueda
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('email', 'like', "%{$searchTerm}%")
+                  ->orWhere('role', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Aplicar ordenamiento
+        $sortField = $request->input('sort_field', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
+
+        // Lista de campos permitidos para ordenar
+        $allowedSortFields = ['name', 'email', 'role', 'created_at'];
+
+        if (in_array($sortField, $allowedSortFields)) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        // Paginación
+        $perPage = $request->input('per_page', 10);
+        $users = $query->paginate($perPage)->withQueryString();
+
         return Inertia::render('admin/users/index', [
-            'users' => $users
+            'users' => $users,
+            'filters' => $request->only(['search', 'sort_field', 'sort_direction', 'per_page'])
         ]);
     }
 
