@@ -3,8 +3,8 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, PageProps } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
-import { Table, Input as AntInput, Button as AntButton, Tag, Space, notification, Popconfirm, Pagination } from 'antd';
-import { SearchOutlined, ClearOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Input as AntInput, Button as AntButton, Tag, Space, notification, Popconfirm, Pagination, Modal } from 'antd';
+import { SearchOutlined, ClearOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 
@@ -160,14 +160,23 @@ export default function UserIndex({ users, filters }: Props) {
     });
   }
 
-  const deleteUser = (id: number) => {
-    router.delete(route('admin.users.destroy', id), {
-      onSuccess: () => {
-        notificationApi.success({
-          message: 'Usuario eliminado',
-          description: 'El usuario ha sido eliminado correctamente',
-          placement: 'topRight',
-          duration: 4
+  const handleDelete = (userId: number) => {
+    Modal.confirm({
+      title: '¿Estás seguro de que quieres eliminar este usuario?',
+      content: 'Esta acción no se puede deshacer.',
+      okText: 'Sí, eliminar',
+      okType: 'danger',
+      cancelText: 'Cancelar',
+      onOk() {
+        router.delete(route('admin.users.destroy', userId), {
+          onError: () => {
+            notificationApi.error({
+              message: 'Error',
+              description: 'Hubo un problema al eliminar el usuario',
+              placement: 'topRight',
+              duration: 4
+            });
+          }
         });
       }
     });
@@ -209,28 +218,34 @@ export default function UserIndex({ users, filters }: Props) {
     {
       title: 'Acciones',
       key: 'action',
+      width: 150,
+      align: 'center',
       render: (_, record) => (
-        <Space size="small">
+        <Space size="middle" className="flex justify-center">
+          <Link href={route('admin.users.show', record.id)}>
+            <AntButton
+              type="text"
+              icon={<EyeOutlined />}
+              title="Ver"
+              className="flex items-center justify-center w-8 h-8"
+            />
+          </Link>
           <Link href={route('admin.users.edit', record.id)}>
             <AntButton
               type="text"
               icon={<EditOutlined />}
               title="Editar"
+              className="flex items-center justify-center w-8 h-8"
             />
           </Link>
-          <Popconfirm
-            title="¿Estás seguro de eliminar este usuario?"
-            onConfirm={() => deleteUser(record.id)}
-            okText="Sí"
-            cancelText="No"
-          >
-            <AntButton
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              title="Eliminar"
-            />
-          </Popconfirm>
+          <AntButton
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            title="Eliminar"
+            className="flex items-center justify-center w-8 h-8"
+            onClick={() => handleDelete(record.id)}
+          />
         </Space>
       ),
     },
