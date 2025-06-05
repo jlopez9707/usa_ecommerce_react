@@ -70,4 +70,12 @@ class User extends Authenticatable
     {
         return in_array($this->role, ['admin']);
     }
+
+    public function reviews(){
+        return $this->hasMany(Review::class);
+    }
+
+    public function shopCartItems(){
+        return $this->hasMany(ShopCartItem::class);
+    }
 }

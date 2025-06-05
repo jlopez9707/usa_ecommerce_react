@@ -38,4 +38,16 @@ class Product extends Model
     {
         return $this->morphMany(Image::class, 'imageable');
     }
+
+    public function reviews(){
+        return $this->hasMany(Review::class);
+    }
+
+    public function shopCartItems(){
+        return $this->hasMany(ShopCartItem::class);
+    }
+
+    public function orders(){
+        return $this->belongsToMany(Order::class);
+    }
 }

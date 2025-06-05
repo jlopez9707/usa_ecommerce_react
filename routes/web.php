@@ -4,6 +4,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\StoreSettingController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::resource('products', ProductController::class)->names('admin.products');
         Route::resource('categories', CategoryController::class)->names('admin.categories');
+        Route::resource('reviews', ReviewController::class)->names('admin.reviews');
         Route::resource('storeSettings', StoreSettingController::class)->names('admin.storeSettings');
 
         // User management routes

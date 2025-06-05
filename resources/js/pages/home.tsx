@@ -35,8 +35,6 @@ import heroSliderTopShape from '@/assets/images/icons/hero-slider-2-top-shape.sv
 import iconArrowDropDown from '@/assets/images/icons/icon-arrow-drop-down.svg';
 import iconDribbbleDark from '@/assets/images/icons/icon-dribbble-dark.svg';
 import iconFacebookDark from '@/assets/images/icons/icon-facebook-f-dark.svg';
-import iconHeartDark from '@/assets/images/icons/icon-heart-dark.svg';
-import iconHeartLight from '@/assets/images/icons/icon-heart-light.svg';
 import iconIosCallDark from '@/assets/images/icons/icon-ios-call-dark.svg';
 import iconMailOpenDark from '@/assets/images/icons/icon-mail-open-dark.svg';
 import iconOpenMenu from '@/assets/images/icons/icon-open-menu.svg';
@@ -44,7 +42,6 @@ import iconPinterestDark from '@/assets/images/icons/icon-pinterest-p-dark.svg';
 import iconSearch from '@/assets/images/icons/icon-search.svg';
 import iconShoppingBagDark from '@/assets/images/icons/icon-shopping-bag-dark.svg';
 import iconShoppingBagLight from '@/assets/images/icons/icon-shopping-bag-light.svg';
-import iconTrash from '@/assets/images/icons/icon-trash.svg';
 import iconTwitterDark from '@/assets/images/icons/icon-twitter-dark.svg';
 import logoDarkTheme from '@/assets/images/logo/logo-dark-theme.png';
 import logoLightTheme from '@/assets/images/logo/logo-light-theme.png';
@@ -57,6 +54,7 @@ import productDefault6 from '@/assets/images/products/default/product-default-st
 import productSmall1 from '@/assets/images/products/small/product-small-1.webp';
 import productSmall2 from '@/assets/images/products/small/product-small-2.webp';
 import productSmall3 from '@/assets/images/products/small/product-small-3.webp';
+import { CartItemSliderProduct } from '@/components/custom/CartItemSliderProduct';
 
 export default function HomePage() {
     return (
@@ -147,9 +145,6 @@ export default function HomePage() {
                                                             <ul className="submenu">
                                                                 <li>
                                                                     <a href="cart.html">Cart</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a href="wishlist.html">Wishlist</a>
                                                                 </li>
                                                                 <li>
                                                                     <a href="compare.html">Compare</a>
@@ -249,14 +244,6 @@ export default function HomePage() {
                                         <button
                                             className="header-action-item header-action-wishlist"
                                             data-bs-toggle="offcanvas"
-                                            data-bs-target="#wishlistOffcanvas"
-                                        >
-                                            <img src={iconHeartLight} alt="" />
-                                            <span className="count-tag">01</span>
-                                        </button>
-                                        <button
-                                            className="header-action-item header-action-wishlist"
-                                            data-bs-toggle="offcanvas"
                                             data-bs-target="#addcartOffcanvas"
                                         >
                                             <img src={iconShoppingBagLight} alt="" />
@@ -297,10 +284,6 @@ export default function HomePage() {
                     </div>
                     <div className="offcanvas-body">
                         <div className="d-flex justify-content-center">
-                            <a href="wishlist.html" className="header-action-item header-action-wishlist">
-                                <img src={iconHeartDark} alt="" />
-                                <span className="count-tag">01</span>
-                            </a>
                             <a href="cart.html" className="header-action-item header-action-wishlist">
                                 <img src={iconShoppingBagDark} alt="" />
                                 <span className="item-count item-count--light">02 ITEMS</span>
@@ -378,9 +361,6 @@ export default function HomePage() {
                                                     <ul className="mobile-sub-menu">
                                                         <li>
                                                             <a href="cart.html">Cart</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="wishlist.html">Wishlist</a>
                                                         </li>
                                                         <li>
                                                             <a href="compare.html">Compare</a>
@@ -490,85 +470,6 @@ export default function HomePage() {
                     </div>
                 </div>
 
-                <div className="offcanvas offcanvas-end" tabIndex={-1} id="wishlistOffcanvas">
-                    <div className="offcanvas-header">
-                        <h5 className="offcanvas-title">Wishlist</h5>
-                        <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                    </div>
-                    <div className="offcanvas-body">
-                        <ul className="offcanvas-products-list">
-                            <li className="single-item">
-                                <div className="box">
-                                    <a href="" className="image">
-                                        <img src={productSmall1} alt="" className="offcanvas-wishlist-image" />
-                                    </a>
-                                    <div className="content">
-                                        <a href="" className="title">
-                                            Tops
-                                        </a>
-                                        <div className="offcanvas-wishlist-item-details">
-                                            <span className="offcanvas-wishlist-item-details-quantity">1 x </span>
-                                            <span className="offcanvas-wishlist-item-details-price">$100.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item-delete text-right">
-                                    <a href="#">
-                                        <img src={iconTrash} alt="" />
-                                    </a>
-                                </div>
-                            </li>
-                            <li className="single-item">
-                                <div className="box">
-                                    <a href="" className="image">
-                                        <img src={productSmall2} alt="" className="offcanvas-wishlist-image" />
-                                    </a>
-                                    <div className="content">
-                                        <a href="" className="title">
-                                            Leggings
-                                        </a>
-                                        <div className="offcanvas-wishlist-item-details">
-                                            <span className="offcanvas-wishlist-item-details-quantity">1 x </span>
-                                            <span className="offcanvas-wishlist-item-details-price">$49.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item-delete text-right">
-                                    <a href="#">
-                                        <img src={iconTrash} alt="" />
-                                    </a>
-                                </div>
-                            </li>
-                            <li className="single-item">
-                                <div className="box">
-                                    <a href="" className="image">
-                                        <img src={productSmall3} alt="" className="offcanvas-wishlist-image" />
-                                    </a>
-                                    <div className="content">
-                                        <a href="" className="title">
-                                            Casual Shirt
-                                        </a>
-                                        <div className="offcanvas-wishlist-item-details">
-                                            <span className="offcanvas-wishlist-item-details-quantity">1 x </span>
-                                            <span className="offcanvas-wishlist-item-details-price">$65.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item-delete text-right">
-                                    <a href="#">
-                                        <img src={iconTrash} alt="" />
-                                    </a>
-                                </div>
-                            </li>
-                        </ul>
-                        <div className="offcanvas-action-link">
-                            <a href="wishlist.html" className="btn">
-                                View wishlist
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
                 <div className="offcanvas offcanvas-end" tabIndex={-1} id="addcartOffcanvas">
                     <div className="offcanvas-header">
                         <h5 className="offcanvas-title">Add Cart</h5>
@@ -576,69 +477,9 @@ export default function HomePage() {
                     </div>
                     <div className="offcanvas-body">
                         <ul className="offcanvas-products-list">
-                            <li className="single-item">
-                                <div className="box">
-                                    <a href="" className="image">
-                                        <img src={productSmall1} alt="" className="offcanvas-wishlist-image" />
-                                    </a>
-                                    <div className="content">
-                                        <a href="" className="title">
-                                            Tops
-                                        </a>
-                                        <div className="offcanvas-wishlist-item-details">
-                                            <span className="offcanvas-wishlist-item-details-quantity">1 x </span>
-                                            <span className="offcanvas-wishlist-item-details-price">$100.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item-delete text-right">
-                                    <a href="#">
-                                        <img src={iconTrash} alt="" />
-                                    </a>
-                                </div>
-                            </li>
-                            <li className="single-item">
-                                <div className="box">
-                                    <a href="" className="image">
-                                        <img src={productSmall2} alt="" className="offcanvas-wishlist-image" />
-                                    </a>
-                                    <div className="content">
-                                        <a href="" className="title">
-                                            Leggings
-                                        </a>
-                                        <div className="offcanvas-wishlist-item-details">
-                                            <span className="offcanvas-wishlist-item-details-quantity">1 x </span>
-                                            <span className="offcanvas-wishlist-item-details-price">$49.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item-delete text-right">
-                                    <a href="#">
-                                        <img src={iconTrash} alt="" />
-                                    </a>
-                                </div>
-                            </li>
-                            <li className="single-item">
-                                <div className="box">
-                                    <a href="" className="image">
-                                        <img src={productSmall3} alt="" className="offcanvas-wishlist-image" />
-                                    </a>
-                                    <div className="content">
-                                        <a href="" className="title">
-                                            Casual Shirt
-                                        </a>
-                                        <div className="offcanvas-wishlist-item-details">
-                                            <span className="offcanvas-wishlist-item-details-quantity">1 x </span>
-                                            <span className="offcanvas-wishlist-item-details-price">$65.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="item-delete text-right">
-                                    <a href="#">
-                                        <img src={iconTrash} alt="" />
-                                    </a>
-                                </div>
-                            </li>
+                            <CartItemSliderProduct cartItem={{ name: 'Tops', price: '100.00', quantity: 1, image: productSmall1 }} />
+                            <CartItemSliderProduct cartItem={{ name: 'Leggings', price: '49.00', quantity: 1, image: productSmall2 }} />
+                            <CartItemSliderProduct cartItem={{ name: 'Casual Shirt', price: '65.00', quantity: 1, image: productSmall3 }} />
                         </ul>
                         <div className="offcanvas-action-link">
                             <a href="cart.html" className="btn">
@@ -826,9 +667,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault1} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -853,9 +691,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault2} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
@@ -882,9 +717,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault3} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -907,9 +739,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault4} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
@@ -936,9 +765,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault5} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -961,9 +787,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault6} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
@@ -1000,9 +823,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault3} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -1025,9 +845,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault4} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
@@ -1054,9 +871,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault1} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -1082,9 +896,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault5} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -1107,9 +918,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault2} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
@@ -1135,9 +943,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault6} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
@@ -1174,9 +979,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault2} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -1201,9 +1003,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault1} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
@@ -1230,9 +1029,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault4} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -1258,9 +1054,6 @@ export default function HomePage() {
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault3} alt="" />
                                                                             </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
-                                                                            </a>
                                                                         </div>
                                                                         <div className="content">
                                                                             <div className="top">
@@ -1283,9 +1076,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault6} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
@@ -1311,9 +1101,6 @@ export default function HomePage() {
                                                                         <div className="image img-responsive">
                                                                             <a href="product-details-default.html">
                                                                                 <img className="img-fluid" src={productDefault5} alt="" />
-                                                                            </a>
-                                                                            <a href="wishlist.html" className="event-btn">
-                                                                                <span className="material-icons">favorite_border</span>
                                                                             </a>
                                                                         </div>
                                                                         <div className="content">
